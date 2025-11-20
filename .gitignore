@@ -1,0 +1,20 @@
+# Ignore Visual Studio temporary files, build results, and user-specific files
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.log
+*.db
+*.DS_Store
+
+# Ignore NuGet packages
+*.nupkg
+packages/
+
+# Ignore Rider IDE files (if ever used)
+.idea/
+
+# Ignore publish output
+publish/

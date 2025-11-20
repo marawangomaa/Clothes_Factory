@@ -1,0 +1,69 @@
+﻿<Window x:Class="Clothes_System.Views.InvoiceDetailsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="تفاصيل الفاتورة" Height="500" Width="700"
+        FlowDirection="RightToLeft"
+        Background="#F0F4F8"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Header -->
+            <RowDefinition Height="Auto"/>
+            <!-- Invoice Info -->
+            <RowDefinition Height="*"/>
+            <!-- Items List -->
+            <RowDefinition Height="Auto"/>
+            <!-- Totals -->
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Text="تفاصيل الفاتورة" FontSize="24" FontWeight="Bold" 
+                   HorizontalAlignment="Center" Margin="0,0,0,10"/>
+
+        <!-- Invoice Info -->
+        <Grid Grid.Row="1" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,20,0">
+                <TextBlock Text="{Binding Type}" FontSize="16" FontWeight="Bold"/>
+                <TextBlock Text="{Binding PaymentMethod, StringFormat=طريقة الدفع: {0}}" Margin="0,4,0,0"/>
+                <TextBlock Text="{Binding Date, StringFormat=التاريخ: {0:dd/MM/yyyy HH:mm}}" Margin="0,4,0,0"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Vertical">
+                <TextBlock Text="{Binding TotalAmount, StringFormat=الإجمالي: {0:C}}" FontSize="16" FontWeight="Bold"/>
+                <TextBlock Text="{Binding PaidAmount, StringFormat=المدفوع: {0:C}}" Margin="0,4,0,0"/>
+                <TextBlock Text="{Binding RemainingAmount, StringFormat=المتبقي: {0:C}}" Margin="0,4,0,0" Foreground="DarkRed"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Items List -->
+        <DataGrid Grid.Row="2"
+                  ItemsSource="{Binding Items}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  AlternatingRowBackground="#E6F0FA"
+                  RowBackground="White"
+                  HeadersVisibility="Column"
+                  Margin="0,0,0,10">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="النموذج" Binding="{Binding ModelName}" Width="*"/>
+                <DataGridTextColumn Header="الكمية" Binding="{Binding Quantity}" Width="80"/>
+                <DataGridTextColumn Header="سعر الوحدة" Binding="{Binding UnitPrice, StringFormat={}{0:C}}" Width="100"/>
+                <DataGridTextColumn Header="الإجمالي" Binding="{Binding Total, StringFormat={}{0:C}}" Width="100"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Footer Totals -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <TextBlock Text="{Binding TotalAmount, StringFormat=الإجمالي: {0:C}}" FontWeight="Bold" FontSize="16" Margin="10,0"/>
+            <TextBlock Text="{Binding PaidAmount, StringFormat=المدفوع: {0:C}}" FontWeight="Bold" FontSize="16" Margin="10,0"/>
+            <TextBlock Text="{Binding RemainingAmount, StringFormat=المتبقي: {0:C}}" FontWeight="Bold" FontSize="16" Foreground="DarkRed" Margin="10,0"/>
+        </StackPanel>
+    </Grid>
+</Window>

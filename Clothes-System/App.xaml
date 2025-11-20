@@ -1,0 +1,9 @@
+﻿<Application x:Class="Clothes_System.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:helpers="clr-namespace:Clothes_System.Helpers">
+
+    <Application.Resources>
+    </Application.Resources>
+
+</Application>

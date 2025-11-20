@@ -1,0 +1,94 @@
+﻿<Page x:Class="Clothes_System.Views.WorkerView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="عرض العمال"
+      FlowDirection="RightToLeft"
+      Background="#F0F4F8">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER: Title + Home Button -->
+        <Grid Margin="0,0,0,15">
+            <TextBlock Text="👷‍♂️ إدارة العمال"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+            <Button Content="🏠 العودة للصفحة الرئيسية"
+                    Click="Back_Click"
+                    Background="#007ACC"
+                    Foreground="White"
+                    FontWeight="Bold"
+                    Padding="8,4"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- Add Worker Section -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15" HorizontalAlignment="Center" VerticalAlignment="Top">
+
+            <!-- Name Field -->
+            <StackPanel Width="150" Margin="5">
+                <TextBlock Text="اسم العامل" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,0,3"/>
+                <TextBox Text="{Binding NewWorker.Name, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <!-- Phone Number Field -->
+            <StackPanel Width="120" Margin="5">
+                <TextBlock Text="رقم الهاتف" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,0,3"/>
+                <TextBox Text="{Binding NewWorker.Ph_Number, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <!-- Weekly Checkbox -->
+            <StackPanel Width="80" Margin="5">
+                <TextBlock Text="نوع الدفع" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,0,3"/>
+                <CheckBox Content="أسبوعي" IsChecked="{Binding NewWorker.Is_Weekly}" HorizontalAlignment="Right"/>
+            </StackPanel>
+
+            <!-- Add Worker Button -->
+            <StackPanel VerticalAlignment="Bottom" Margin="5">
+                <Button Content="إضافة عامل" 
+                        Command="{Binding AddWorkerCommand}" 
+                        Background="#007ACC" 
+                        Foreground="White" 
+                        FontWeight="Bold"
+                        Width="120" Height="35"/>
+            </StackPanel>
+
+        </StackPanel>
+
+        <!-- Workers List -->
+        <DataGrid Grid.Row="2" ItemsSource="{Binding Workers}" AutoGenerateColumns="False" 
+                  CanUserAddRows="False" SelectedItem="{Binding SelectedWorker}" Margin="0,10,0,0"
+                  AlternatingRowBackground="#E6F0FA"
+                  RowBackground="White"
+                  HeadersVisibility="Column"
+                  HorizontalAlignment="Stretch">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="الرقم" Binding="{Binding ID}" Width="50"/>
+                <DataGridTextColumn Header="الاسم" Binding="{Binding Name}" Width="*"/>
+                <DataGridTextColumn Header="رقم الهاتف" Binding="{Binding Ph_Number}" Width="120"/>
+                <DataGridCheckBoxColumn Header="أسبوعي" Binding="{Binding Is_Weekly}" Width="80"/>
+                <DataGridTextColumn Header="عدد الأسعار" Binding="{Binding Price_Count}" Width="100"/>
+                <DataGridTemplateColumn Header="العمليات" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="التفاصيل"
+                                    Background="#28A745"
+                                    Foreground="White"
+                                    FontWeight="Bold"
+                                    Width="80" Height="28"
+                                    Command="{Binding DataContext.OpenWorkerDetailsCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                    CommandParameter="{Binding}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Page>

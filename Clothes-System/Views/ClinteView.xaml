@@ -1,0 +1,74 @@
+﻿<Page x:Class="Clothes_System.Views.ClinteView"
+   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+   mc:Ignorable="d"
+   d:DesignHeight="450" d:DesignWidth="800"
+   FlowDirection="RightToLeft"
+   Background="#F0F4F8">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Back to Menu Button -->
+        <Button Content="العودة إلى القائمة" Width="150" Height="40" Margin="0,0,0,10"
+            Background="#007ACC" Foreground="White" FontWeight="Bold"
+            Click="Back_Click"/>
+
+        <!-- Add Form -->
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,15" Grid.Row="1" HorizontalAlignment="Center">
+            <StackPanel>
+                <TextBlock Text="الاسم" Foreground="#555" Margin="5,0,5,2" HorizontalAlignment="Center"/>
+                <TextBox Width="120" Margin="5"
+                     Text="{Binding NewClinte.Name, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock Text="رقم الهاتف" Foreground="#555" Margin="5,0,5,2" HorizontalAlignment="Center"/>
+                <TextBox Width="120" Margin="5"
+                     Text="{Binding NewClinte.Ph_Number, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock Text="الموقع" Foreground="#555" Margin="5,0,5,2" HorizontalAlignment="Center"/>
+                <TextBox Width="120" Margin="5"
+                     Text="{Binding NewClinte.Location, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock Text="الدين" Foreground="#555" Margin="5,0,5,2" HorizontalAlignment="Center"/>
+                <TextBox Width="100" Margin="5"
+                     Text="{Binding NewClinte.Debt, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <Button Content="إضافة" Width="80" Background="#28A745" Foreground="White"
+                Command="{Binding AddClinteCommand}" Margin="5"/>
+        </StackPanel>
+
+        <!-- Clients List -->
+        <StackPanel Grid.Row="2">
+            <DataGrid ItemsSource="{Binding Clintes}"
+                  SelectedItem="{Binding SelectedClinte, Mode=TwoWay}"
+                  AutoGenerateColumns="True"
+                  CanUserAddRows="False"
+                  Height="300"
+                  GridLinesVisibility="Horizontal"
+                  AlternatingRowBackground="#E6F0FA"
+                  RowBackground="White"
+                  HorizontalAlignment="Stretch"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                <Button Content="حذف" Width="100" Margin="5" Background="#DC3545" Foreground="White"
+                    Command="{Binding DeleteClinteCommand}"/>
+                <Button Content="التفاصيل" Width="100" Margin="5" Background="#17A2B8" Foreground="White"
+                    Command="{Binding OpenDetailsCommand}"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+
+</Page>

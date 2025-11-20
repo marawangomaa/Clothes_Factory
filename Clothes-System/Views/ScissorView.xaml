@@ -1,0 +1,117 @@
+﻿<Page x:Class="Clothes_System.Views.ScissorView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d"
+      Title="إدارة المقصات"
+      Background="#FAFAFA"
+      FlowDirection="RightToLeft">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <DockPanel Margin="0,0,0,15">
+            <Button Content="🏠 العودة للصفحة الرئيسية"
+                    Click="Back_Click"
+                    Background="#007ACC"
+                    Foreground="White"
+                    FontWeight="Bold"
+                    Padding="10,5"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Left"/>
+
+            <TextBlock Text="✂️ إدارة المقصات"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Foreground="#2C3E50"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"/>
+
+            <Button Content="⟳ تحديث"
+                    Command="{Binding RefreshCommand}"
+                    Background="#3498DB"
+                    Foreground="White"
+                    FontWeight="SemiBold"
+                    Padding="12,6"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Right"/>
+        </DockPanel>
+
+        <!-- MAIN CONTENT -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- LEFT PANEL -->
+            <Border Background="White" CornerRadius="10" Padding="15"
+                    BorderBrush="#DDD" BorderThickness="1" Grid.Column="0">
+                <StackPanel>
+                    <TextBlock Text="إضافة قصّة جديدة" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+
+                    <TextBlock Text="النموذج:" Margin="0,5,0,2"/>
+                    <ComboBox ItemsSource="{Binding Models}"
+                              SelectedItem="{Binding SelectedModel, Mode=TwoWay}"
+                              DisplayMemberPath="Name"
+                              Margin="0,0,0,10"
+                              Padding="5"/>
+
+                    <TextBlock Text="المتر:" Margin="0,5,0,2"/>
+                    <TextBox Text="{Binding Meters, UpdateSourceTrigger=PropertyChanged}" 
+                             Margin="0,0,0,10" 
+                             Padding="5"/>
+
+                    <Button Content="إضافة القصّة" 
+                            Command="{Binding AddCutCommand}" 
+                            Background="#27AE60"
+                            Foreground="White"
+                            Padding="10,5"
+                            FontWeight="SemiBold"
+                            BorderThickness="0"
+                            Cursor="Hand"/>
+                </StackPanel>
+            </Border>
+
+            <!-- RIGHT PANEL -->
+            <Border Grid.Column="2" Background="White" CornerRadius="10" Padding="15" 
+                    BorderBrush="#DDD" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="قائمة القصّات" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <DataGrid ItemsSource="{Binding Cuts}" 
+                              AutoGenerateColumns="False" 
+                              IsReadOnly="True"
+                              AlternatingRowBackground="#F7F9FA"
+                              HeadersVisibility="Column"
+                              CanUserAddRows="False"
+                              RowHeight="32">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="النموذج" Binding="{Binding Model}" Width="*"/>
+                            <DataGridTextColumn Header="المتر" Binding="{Binding Number}" Width="*"/>
+                            <DataGridTextColumn Header="التاريخ" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- FOOTER -->
+        <Border Grid.Row="2" Margin="0,15,0,0" Padding="10" Background="#E9F2FF" CornerRadius="8">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="إجمالي المترات المقطوعة: " FontWeight="Bold" FontSize="14"/>
+                <TextBlock Text="{Binding TotalMetersCut}" FontSize="14" Foreground="#0066FF" FontWeight="Bold"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Page>
