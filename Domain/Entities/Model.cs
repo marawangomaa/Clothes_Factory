@@ -14,6 +14,7 @@ namespace Domain.Entities
         public string Type { get; set; }
         public string? Image { get; set; }
         public decimal Cost { get; set; }
+        public int? Metrag {  get; set; }
         public decimal SellPrice { get; set; }
         public int? Quantity { get; set; } // available in storage
 
@@ -21,6 +22,8 @@ namespace Domain.Entities
         public Storage Storage { get; set; }
 
         public ICollection<InvoiceModel> InvoiceModels { get; set; } = new List<InvoiceModel>();
+
+        public string? Notes { get; set; }
     }
 
 }

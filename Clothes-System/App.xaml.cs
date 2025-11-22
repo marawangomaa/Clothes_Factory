@@ -127,7 +127,7 @@ namespace Clothes_System
             Console.WriteLine("DB will be created at: " + dbFilePath);
 
             // Ensure DB is created
-            await db.Database.EnsureCreatedAsync();
+            //await db.Database.EnsureCreatedAsync();
 
             // Force a dummy query to open the connection
             var _ = await db.Banks.CountAsync();

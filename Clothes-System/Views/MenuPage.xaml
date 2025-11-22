@@ -55,14 +55,14 @@
 
         <!-- Main Layout -->
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="300">
-            <TextBlock Text="مصنع الملابس"
+            <TextBlock Text="Eleganz"
                        Foreground="White" FontSize="32" FontWeight="Bold"
                        Margin="0,0,0,30"
                        HorizontalAlignment="Center"/>
             <Button Content="العملاء" Click="Clients_Click" Style="{StaticResource BlueButtonStyle}"/>
             <Button Content="المواد" Click="Materials_Click" Style="{StaticResource BlueButtonStyle}"/>
             <Button Content="العمال" Click="Workers_Click" Style="{StaticResource BlueButtonStyle}"/>
-            <Button Content="النماذج" Click="Models_Click" Style="{StaticResource BlueButtonStyle}"/>
+            <Button Content="الموديل" Click="Models_Click" Style="{StaticResource BlueButtonStyle}"/>
             <Button Content="المقص" Click="Scissors_Click" Style="{StaticResource BlueButtonStyle}"/>
             <Button Content="المخزن" Click="Storage_Click" Style="{StaticResource BlueButtonStyle}"/>
             <Button Content="البنك" Click="Bank_Click" Style="{StaticResource BlueButtonStyle}"/>

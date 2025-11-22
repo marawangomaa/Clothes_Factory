@@ -17,7 +17,7 @@
 
         <!-- HEADER: Title + Home Button -->
         <Grid Margin="0,0,0,15">
-            <TextBlock Text="📐 إدارة النماذج"
+            <TextBlock Text="📐 انشاء موديل"
                        FontSize="24"
                        FontWeight="Bold"
                        HorizontalAlignment="Center"
@@ -52,6 +52,11 @@
                     <StackPanel Margin="5">
                         <TextBlock Text="الكود" FontWeight="Bold" Margin="0,0,0,2"/>
                         <TextBox Width="100" Text="{Binding Code}" />
+                    </StackPanel>
+
+                    <StackPanel Margin="5">
+                        <TextBlock Text="المتراج" FontWeight="Bold" Margin="0,0,0,2"/>
+                        <TextBox Width="100" Text="{Binding Metrag}" />
                     </StackPanel>
 
                     <StackPanel Margin="5">
@@ -103,8 +108,10 @@
                 <DataGridTextColumn Header="النوع" Binding="{Binding Type}" Width="100"/>
                 <DataGridTextColumn Header="الكود" Binding="{Binding Code}" Width="100"/>
                 <DataGridTextColumn Header="التكلفة" Binding="{Binding Cost}" Width="100"/>
+                <DataGridTextColumn Header="المتراج" Binding="{Binding Metrag}" Width="100"/>
                 <DataGridTextColumn Header="سعر البيع" Binding="{Binding SellPrice}" Width="100"/>
                 <DataGridTextColumn Header="الكمية" Binding="{Binding Quantity}" Width="100"/>
+                <DataGridTextColumn Header="ملاحظات" Binding="{Binding Notes}" Width="100"/>
 
                 <DataGridTemplateColumn Header="الإجراءات" Width="250">
                     <DataGridTemplateColumn.CellTemplate>

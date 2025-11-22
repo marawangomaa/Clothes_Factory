@@ -40,6 +40,7 @@
                            StretchDirection="Both" />
 
                     <StackPanel VerticalAlignment="Top">
+                        <TextBlock Text="{Binding CurrentModel.Name}" Margin="0,0,0,5"/>
                         <TextBlock Text="{Binding CurrentModel.Code}" FontWeight="Bold" FontSize="16" Margin="0,0,0,5"/>
                         <TextBlock Text="التكلفة:" FontWeight="Bold"/>
                         <TextBlock Text="{Binding CurrentModel.Cost}" Margin="0,0,0,5"/>

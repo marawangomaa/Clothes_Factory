@@ -46,12 +46,12 @@ namespace Application.Services
             var newTotal = isIncome ? bank.TotalAmount + amount : bank.TotalAmount - amount;
 
             if (newTotal < 0)
-                throw new Exception("Not enough money in the bank to complete this transaction.");
+                throw new Exception("لا يوجد مال كافى فى البنك لاتمام العملية");
 
             var transaction = new BankTransaction
             {
                 Date = DateTime.Now,
-                Type = isIncome ? "Income" : "Outcome",
+                Type = isIncome ? "دخل" : "خارج",
                 Amount = amount,
                 TotalAfterTransaction = newTotal,
                 BankID = bank.ID

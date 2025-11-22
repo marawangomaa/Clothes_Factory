@@ -65,6 +65,7 @@
                   CanUserAddRows="False"
                   Margin="0,10,0,0">
             <DataGrid.Columns>
+                <DataGridTextColumn Header="الاسم" Binding="{Binding Type}" Width="*" />
                 <DataGridTextColumn Header="النوع" Binding="{Binding Type}" Width="*" />
                 <DataGridTextColumn Header="المبلغ" Binding="{Binding Amount}" Width="100" />
                 <DataGridTextColumn Header="التاريخ" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}}" Width="150" />

@@ -80,16 +80,16 @@ namespace Application.Services
 
                 var relatedTx = transactions.Where(t => t.InvoiceID == inv.ID);
 
-                decimal income = relatedTx.Where(t => t.Type == "Income").Sum(t => t.Amount);
-                decimal outcome = relatedTx.Where(t => t.Type == "Outcome").Sum(t => t.Amount);
+                decimal income = relatedTx.Where(t => t.Type == "دخل").Sum(t => t.Amount);
+                decimal outcome = relatedTx.Where(t => t.Type == "خارج").Sum(t => t.Amount);
 
                 decimal paid = Math.Max(income - outcome, 0);
-                decimal remaining = inv.InvoiceType == "Return" ? 0 : Math.Max(total - paid, 0);
+                decimal remaining = inv.InvoiceType == "مرتجع" ? 0 : Math.Max(total - paid, 0);
 
                 result.Add(new InvoiceDisplayDto
                 {
                     Id = inv.ID,
-                    Type = inv.InvoiceType ?? "Unknown",
+                    Type = inv.InvoiceType ?? "غير معرف",
                     Date = inv.Date,
                     Items = items,
                     TotalAmount = total,
@@ -139,15 +139,15 @@ namespace Application.Services
                     .ToList();
 
                 var relatedTx = transactions.Where(t => t.InvoiceID == inv.ID);
-                decimal income = relatedTx.Where(t => t.Type == "Income").Sum(t => t.Amount);
-                decimal outcome = relatedTx.Where(t => t.Type == "Outcome").Sum(t => t.Amount);
+                decimal income = relatedTx.Where(t => t.Type == "دخل").Sum(t => t.Amount);
+                decimal outcome = relatedTx.Where(t => t.Type == "خارج").Sum(t => t.Amount);
 
                 decimal paidAmount = Math.Max(income - outcome, 0);
 
                 result.Add(new InvoiceViewDto
                 {
                     InvoiceId = inv.ID,
-                    InvoiceType = inv.InvoiceType ?? "Unknown",
+                    InvoiceType = inv.InvoiceType ?? "غير معرف",
                     Date = inv.Date,
                     Items = items,
                     PaidAmount = paidAmount,
@@ -164,7 +164,7 @@ namespace Application.Services
         public async Task<List<SellItemDto>> GetClientSellItemsAsync(int clientId)
         {
             var soldInvoices = (await _invoiceRepo.GetAllAsync())
-                .Where(i => i.ClinteID == clientId && i.InvoiceType == "Sell")
+                .Where(i => i.ClinteID == clientId && i.InvoiceType == "فاتورة جديدة")
                 .ToList();
 
             var soldInvoiceIds = soldInvoices.Select(i => i.ID).ToList();
@@ -175,7 +175,7 @@ namespace Application.Services
 
             // Previous returns
             var returnInvoices = (await _invoiceRepo.GetAllAsync())
-                .Where(i => i.ClinteID == clientId && i.InvoiceType == "Return")
+                .Where(i => i.ClinteID == clientId && i.InvoiceType == "مرتجع")
                 .Select(i => i.ID)
                 .ToList();
 
@@ -224,24 +224,24 @@ namespace Application.Services
             string paymentType,
             decimal paymentAmount = 0)
         {
-            var client = await _clientRepo.GetByIdAsync(clientId) ?? throw new Exception("Client not found.");
+            var client = await _clientRepo.GetByIdAsync(clientId) ?? throw new Exception("العميل غير موجود");
             var bank = await _bankService.GetOrCreateBankAsync();
 
             // ----------- CHECK STOCK FIRST -------------
             foreach (var item in items)
             {
                 var model = await _modelRepo.GetByIdAsync(item.ModelId)
-                    ?? throw new Exception("Model not found.");
+                    ?? throw new Exception("الموديل غير موجود");
 
                 var store = model.StorageID.HasValue
                     ? await _storageRepo.GetByIdAsync(model.StorageID.Value)
                     : (await _storageRepo.GetAllAsync()).FirstOrDefault(s => s.Product_Name == model.Name);
 
                 if (store == null)
-                    throw new Exception($"Storage not found for model: {model.Name}");
+                    throw new Exception($"الموديل غير موجود: {model.Name}");
 
                 if (store.Number_Of_Products < item.Quantity)
-                    throw new Exception($"Not enough stock for {model.Name}");
+                    throw new Exception($"العدد غير كافى من {model.Name}");
             }
 
             // ----------- CREATE INVOICE AFTER STOCK CHECK -------------
@@ -249,12 +249,12 @@ namespace Application.Services
             {
                 Date = DateTime.Now,
                 Number = Guid.NewGuid().ToString("N")[..8].ToUpper(),
-                InvoiceType = "Sell",
+                InvoiceType = "فاتورة جديدة",
                 TotalAmount = totalAmount,
                 ClinteID = clientId,
                 BankID = bank.ID,
                 PaymentMethod = paymentType,
-                Type = "Sell"
+                Type = "فاتورة جديدة"
             };
 
             await _invoiceRepo.AddAsync(invoice);
@@ -295,7 +295,7 @@ namespace Application.Services
                 await _transactionRepo.AddAsync(new BankTransaction
                 {
                     Date = DateTime.Now,
-                    Type = "Income",
+                    Type = "دخل",
                     Amount = pay,
                     TotalAfterTransaction = bank.TotalAmount,
                     InvoiceID = invoice.ID,
@@ -320,10 +320,10 @@ namespace Application.Services
         public async Task AddReturnInvoiceAsync(int clientId, List<ReturnItemDto> items, decimal totalRefund)
         {
             if (!items.Any())
-                throw new Exception("No items to return.");
+                throw new Exception("لا يوجد تطابق فى عدد القطع");
 
             var client = await _clientRepo.GetByIdAsync(clientId)
-                         ?? throw new Exception("Client not found.");
+                         ?? throw new Exception("العميل غير موجود");
 
             var bank = await _bankService.GetOrCreateBankAsync();
 
@@ -331,12 +331,12 @@ namespace Application.Services
             {
                 Date = DateTime.Now,
                 Number = Guid.NewGuid().ToString("N")[..8].ToUpper(),
-                InvoiceType = "Return",
+                InvoiceType = "مرتجع",
                 TotalAmount = totalRefund,
                 ClinteID = clientId,
                 BankID = bank.ID,
-                PaymentMethod = "Return",
-                Type = "Return"
+                PaymentMethod = "مرتجع",
+                Type = "مرتجع"
             };
 
             await _invoiceRepo.AddAsync(invoice);
@@ -345,14 +345,14 @@ namespace Application.Services
             foreach (var item in items)
             {
                 var model = await _modelRepo.GetByIdAsync(item.ItemId)
-                            ?? throw new Exception($"Model not found: {item.ItemName}");
+                            ?? throw new Exception($"الموديل غير موجود: {item.ItemName}");
 
                 var storage = model.StorageID.HasValue
                     ? await _storageRepo.GetByIdAsync(model.StorageID.Value)
                     : (await _storageRepo.GetAllAsync()).FirstOrDefault(s => s.Product_Name == model.Name);
 
                 if (storage == null)
-                    throw new Exception($"Storage not found for model: {model.Name}");
+                    throw new Exception($"الموديل غير موجود فى المخزن: {model.Name}");
 
                 storage.Number_Of_Products += item.ReturnQty;
                 _storageRepo.Update(storage);
@@ -376,7 +376,7 @@ namespace Application.Services
             await _transactionRepo.AddAsync(new BankTransaction
             {
                 Date = DateTime.Now,
-                Type = "Outcome",                 // <--- mark as Outcome
+                Type = "خارج",                 // <--- mark as Outcome
                 Amount = totalRefund,
                 TotalAfterTransaction = bank.TotalAmount,
                 InvoiceID = invoice.ID,
@@ -398,13 +398,13 @@ namespace Application.Services
         // ================================================================
         // 6) PAYMENT ONLY
         // ================================================================
-        public async Task AddPaymentAsync(int clientId, decimal amount, string paymentMethod = "Payment")
+        public async Task AddPaymentAsync(int clientId, decimal amount, string paymentMethod = "دفعة")
         {
             if (amount <= 0)
-                throw new Exception("Invalid amount.");
+                throw new Exception("رقم غير صالح");
 
             // load client and bank
-            var client = await _clientRepo.GetByIdAsync(clientId) ?? throw new Exception("Client not found.");
+            var client = await _clientRepo.GetByIdAsync(clientId) ?? throw new Exception("العميل غير موجود");
             var bank = await _bankService.GetOrCreateBankAsync();
 
             // 1) create payment invoice so we have an Invoice.ID to link to the transaction
@@ -412,9 +412,9 @@ namespace Application.Services
             {
                 Date = DateTime.Now,
                 Number = Guid.NewGuid().ToString("N")[..8].ToUpper(),
-                PaymentMethod = paymentMethod ?? "Payment",   // store the chosen method
-                InvoiceType = "Payment",
-                Type = "Payment",                              // if you use Type string for something else adjust accordingly
+                PaymentMethod = paymentMethod ?? "دفعة",   // store the chosen method
+                InvoiceType = "دفعة",
+                Type = "دفعة",                              // if you use Type string for something else adjust accordingly
                 TotalAmount = amount,
                 ClinteID = clientId,
                 BankID = bank.ID
@@ -430,7 +430,7 @@ namespace Application.Services
             var tx = new BankTransaction
             {
                 Date = DateTime.Now,
-                Type = "Income",
+                Type = "دخل",
                 Amount = amount,
                 TotalAfterTransaction = bank.TotalAmount,
                 InvoiceID = invoice.ID,
@@ -457,7 +457,7 @@ namespace Application.Services
             try
             {
                 if (!items.Any())
-                    return ServiceResult<bool>.Fail("No items to return.");
+                    return ServiceResult<bool>.Fail("لا يوجد موديل للارجاع");
 
                 decimal refund = items.Sum(i => i.Total);
 

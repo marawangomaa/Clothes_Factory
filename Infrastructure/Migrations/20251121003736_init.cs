@@ -15,8 +15,8 @@ namespace Infrastructure.Migrations
                 name: "Banks",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
@@ -28,12 +28,12 @@ namespace Infrastructure.Migrations
                 name: "Clintes",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Ph_Number = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Location = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
-                    Debt = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    Ph_Number = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    Location = table.Column<string>(type: "TEXT", maxLength: 300, nullable: false),
+                    Debt = table.Column<decimal>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -44,11 +44,11 @@ namespace Infrastructure.Migrations
                 name: "Scissors",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Number = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Model = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Number = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Model = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -59,11 +59,11 @@ namespace Infrastructure.Migrations
                 name: "Storages",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Product_Type = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Product_Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Number_Of_Products = table.Column<int>(type: "int", nullable: false)
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Product_Type = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Product_Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    Number_Of_Products = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -74,11 +74,11 @@ namespace Infrastructure.Migrations
                 name: "Workers",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Is_Weekly = table.Column<bool>(type: "bit", nullable: false),
-                    Ph_Number = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Is_Weekly = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Ph_Number = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 150, nullable: false),
                     Price_Count = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
@@ -90,13 +90,14 @@ namespace Infrastructure.Migrations
                 name: "Materials",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    BankID = table.Column<int>(type: "int", nullable: false)
+                    Quantity = table.Column<int>(type: "INTEGER", nullable: false),
+                    TotalCost = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    BankID = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -113,14 +114,17 @@ namespace Infrastructure.Migrations
                 name: "Invoices",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Number = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    PaymentType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Number = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    PaymentMethod = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ClinteID = table.Column<int>(type: "int", nullable: false),
-                    BankID = table.Column<int>(type: "int", nullable: false)
+                    InvoiceType = table.Column<string>(type: "TEXT", nullable: false),
+                    Type = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
+                    ClinteID = table.Column<int>(type: "INTEGER", nullable: false),
+                    BankID = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -143,27 +147,22 @@ namespace Infrastructure.Migrations
                 name: "Models",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Code = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Code = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Type = table.Column<string>(type: "TEXT", nullable: false),
+                    Image = table.Column<string>(type: "TEXT", nullable: true),
                     Cost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Metrag = table.Column<int>(type: "INTEGER", nullable: true),
                     SellPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    StorageID = table.Column<int>(type: "int", nullable: true),
-                    ScissorID = table.Column<int>(type: "int", nullable: true)
+                    Quantity = table.Column<int>(type: "INTEGER", nullable: false),
+                    StorageID = table.Column<int>(type: "INTEGER", nullable: true),
+                    Notes = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Models", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_Models_Scissors_ScissorID",
-                        column: x => x.ScissorID,
-                        principalTable: "Scissors",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Models_Storages_StorageID",
                         column: x => x.StorageID,
@@ -176,11 +175,11 @@ namespace Infrastructure.Migrations
                 name: "WorkerPieces",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    WorkerID = table.Column<int>(type: "int", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Pieces = table.Column<int>(type: "int", nullable: false)
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    WorkerID = table.Column<int>(type: "INTEGER", nullable: false),
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Pieces = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -197,16 +196,16 @@ namespace Infrastructure.Migrations
                 name: "BankTransaction",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Type = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TotalAfterTransaction = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    InvoiceID = table.Column<int>(type: "int", nullable: true),
-                    MaterialID = table.Column<int>(type: "int", nullable: true),
-                    WorkerID = table.Column<int>(type: "int", nullable: true),
-                    BankID = table.Column<int>(type: "int", nullable: false)
+                    InvoiceID = table.Column<int>(type: "INTEGER", nullable: true),
+                    MaterialID = table.Column<int>(type: "INTEGER", nullable: true),
+                    WorkerID = table.Column<int>(type: "INTEGER", nullable: true),
+                    BankID = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -241,8 +240,8 @@ namespace Infrastructure.Migrations
                 name: "InvoiceStorage",
                 columns: table => new
                 {
-                    InvoiceID = table.Column<int>(type: "int", nullable: false),
-                    StorageID = table.Column<int>(type: "int", nullable: false)
+                    InvoiceID = table.Column<int>(type: "INTEGER", nullable: false),
+                    StorageID = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -265,11 +264,11 @@ namespace Infrastructure.Migrations
                 name: "InvoiceModel",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    InvoiceID = table.Column<int>(type: "int", nullable: false),
-                    ModelID = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    InvoiceID = table.Column<int>(type: "INTEGER", nullable: false),
+                    ModelID = table.Column<int>(type: "INTEGER", nullable: false),
+                    Quantity = table.Column<int>(type: "INTEGER", nullable: false),
                     UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
@@ -345,11 +344,6 @@ namespace Infrastructure.Migrations
                 column: "BankID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Models_ScissorID",
-                table: "Models",
-                column: "ScissorID");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Models_StorageID",
                 table: "Models",
                 column: "StorageID");
@@ -373,6 +367,9 @@ namespace Infrastructure.Migrations
                 name: "InvoiceStorage");
 
             migrationBuilder.DropTable(
+                name: "Scissors");
+
+            migrationBuilder.DropTable(
                 name: "WorkerPieces");
 
             migrationBuilder.DropTable(
@@ -386,9 +383,6 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Workers");
-
-            migrationBuilder.DropTable(
-                name: "Scissors");
 
             migrationBuilder.DropTable(
                 name: "Storages");

@@ -22,58 +22,58 @@ namespace Application.Services
         public async Task<(bool Success, string Message)> AddClinteAsync(Clinte clinte)
         {
             if (clinte == null)
-                return (false, "Client data cannot be null.");
+                return (false, "بيانات العميل لا يمكن ان تكون فارغة");
 
             if (string.IsNullOrWhiteSpace(clinte.Name) ||
                 string.IsNullOrWhiteSpace(clinte.Ph_Number) ||
                 string.IsNullOrWhiteSpace(clinte.Location))
             {
-                return (false, "Please fill all required fields: Name, Phone, and Location.");
+                return (false, "من فضلك املاء جميع الخانات: الاسم, رقم الهاتف, و الموقع");
             }
 
             try
             {
                 await _ClintRepo.AddAsync(clinte);
                 await _ClintRepo.SaveChangesAsync();
-                return (true, "Client added successfully.");
+                return (true, "تم اضافة العميل بنجاح");
             }
             catch (System.Exception ex)
             {
-                return (false, $"Database error: {ex.Message}");
+                return (false, $"خظء فى قاعدة البيانات: {ex.Message}");
             }
         }
 
         public async Task<(bool Success, string Message)> UpdateClinteAsync(Clinte clinte)
         {
             if (clinte == null)
-                return (false, "Client cannot be null.");
+                return (false, "بيانات العميل لا يمكن ان تكون فارغة");
 
             try
             {
                 _ClintRepo.Update(clinte);
                 await _ClintRepo.SaveChangesAsync();
-                return (true, "Client updated successfully.");
+                return (true, "تم تعديل العميل بنجاح");
             }
             catch (System.Exception ex)
             {
-                return (false, $"Update failed: {ex.Message}");
+                return (false, $"فشل التحديث: {ex.Message}");
             }
         }
 
         public async Task<(bool Success, string Message)> DeleteClinteAsync(Clinte clinte)
         {
             if (clinte == null)
-                return (false, "Client cannot be null.");
+                return (false, "لا يمكن ان تكون بيانات العميل فارغة");
 
             try
             {
                 _ClintRepo.Remove(clinte);
                 await _ClintRepo.SaveChangesAsync();
-                return (true, "Client deleted successfully.");
+                return (true, "تم حذف العميل بنجاح");
             }
             catch (System.Exception ex)
             {
-                return (false, $"Delete failed: {ex.Message}");
+                return (false, $"فشل الحزف: {ex.Message}");
             }
         }
     }

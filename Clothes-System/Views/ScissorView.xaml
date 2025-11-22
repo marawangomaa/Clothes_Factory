@@ -68,11 +68,12 @@
                               Margin="0,0,0,10"
                               Padding="5"/>
 
-                    <TextBlock Text="المتر:" Margin="0,5,0,2"/>
+                    <!-- المتراج -->
+                    <TextBlock Text="عدد القطع:" Margin="0,5,0,2"/>
                     <TextBox Text="{Binding Meters, UpdateSourceTrigger=PropertyChanged}" 
                              Margin="0,0,0,10" 
                              Padding="5"/>
-
+                    <!-- Notes  -->
                     <Button Content="إضافة القصّة" 
                             Command="{Binding AddCutCommand}" 
                             Background="#27AE60"
@@ -97,8 +98,11 @@
                               CanUserAddRows="False"
                               RowHeight="32">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="النموذج" Binding="{Binding Model}" Width="*"/>
-                            <DataGridTextColumn Header="المتر" Binding="{Binding Number}" Width="*"/>
+                            <DataGridTextColumn Header="الموديل" Binding="{Binding Model}" Width="*"/>
+                            <DataGridTextColumn Header="عدد القطع" Binding="{Binding Number}" Width="*"/>
+                            <DataGridTextColumn Header="المتراج" Binding="{Binding Number}" Width="*"/>
+                            <!-- Not Done -->
+
                             <DataGridTextColumn Header="التاريخ" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}}" Width="*"/>
                         </DataGrid.Columns>
                     </DataGrid>

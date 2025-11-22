@@ -115,7 +115,7 @@ namespace Application.Services
             var transaction = new BankTransaction
             {
                 Date = DateTime.Now,
-                Type = "Outcome",
+                Type = "خارج",
                 Amount = amount,
                 TotalAfterTransaction = newTotal,
                 WorkerID = worker.ID,

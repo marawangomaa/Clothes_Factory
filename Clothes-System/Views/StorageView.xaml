@@ -44,7 +44,7 @@
                   HorizontalAlignment="Stretch"
                   Margin="0,0,0,0">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="المنتج" Binding="{Binding Product_Name}" Width="*" />
+                <DataGridTextColumn Header="الموديل" Binding="{Binding Product_Name}" Width="*" />
                 <DataGridTextColumn Header="النوع" Binding="{Binding Product_Type}" Width="150" />
                 <DataGridTextColumn Header="الكمية" Binding="{Binding Number_Of_Products}" Width="120" />
             </DataGrid.Columns>

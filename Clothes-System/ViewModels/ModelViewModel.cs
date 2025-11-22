@@ -19,6 +19,7 @@ namespace Clothes_System.ViewModels
         private string _name;
         private string _type;
         private string _code;
+        private int _metrag;
         private decimal _cost;
         private decimal _sellPrice;
         private string _image;
@@ -26,6 +27,7 @@ namespace Clothes_System.ViewModels
         public string Name { get => _name; set { _name = value; OnPropertyChanged(); } }
         public string Type { get => _type; set { _type = value; OnPropertyChanged(); } }
         public string Code { get => _code; set { _code = value; OnPropertyChanged(); } }
+        public int Metrag { get => _metrag; set { _metrag = value; OnPropertyChanged(); } }
         public decimal Cost { get => _cost; set { _cost = value; OnPropertyChanged(); } }
         public decimal SellPrice { get => _sellPrice; set { _sellPrice = value; OnPropertyChanged(); } }
         public string Image { get => _image; set { _image = value; OnPropertyChanged(); } }
@@ -68,6 +70,7 @@ namespace Clothes_System.ViewModels
                 Name = Name,
                 Type = Type,
                 Code = Code,
+                Metrag = Metrag,
                 Cost = Cost,
                 SellPrice = SellPrice,
                 Image = Image,
