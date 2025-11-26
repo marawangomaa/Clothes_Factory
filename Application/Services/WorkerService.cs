@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Application.Services
@@ -13,23 +12,20 @@ namespace Application.Services
     public class WorkerService
     {
         private readonly IWorkerRepository _workerRepo;
-        private readonly IRepository<WorkerPiece> _workerPieceRepo;
+        private readonly IRepository<WorkerPieceDetail> _workerPieceDetailRepo;
+        private readonly IRepository<Model> _modelRepo;
         private readonly BankService _bankService;
-        private readonly IRepository<BankTransaction> _transactionRepo;
-        private readonly IRepository<Bank> _bankRepo;
 
         public WorkerService(
             IWorkerRepository workerRepo,
-            IRepository<WorkerPiece> workerPieceRepo,
-            BankService bankService,
-            IRepository<BankTransaction> transactionRepo,
-            IRepository<Bank> bankRepo)
+            IRepository<WorkerPieceDetail> workerPieceDetailRepo,
+            IRepository<Model> modelRepo,
+            BankService bankService)
         {
             _workerRepo = workerRepo;
-            _workerPieceRepo = workerPieceRepo;
+            _workerPieceDetailRepo = workerPieceDetailRepo;
+            _modelRepo = modelRepo;
             _bankService = bankService;
-            _transactionRepo = transactionRepo;
-            _bankRepo = bankRepo;
         }
 
         // ========================
@@ -39,8 +35,11 @@ namespace Application.Services
         public async Task AddWorkerAsync(Worker worker)
         {
             if (worker == null) throw new ArgumentNullException(nameof(worker));
-            if (string.IsNullOrWhiteSpace(worker.Name)) throw new Exception("Worker name is required.");
-            if (string.IsNullOrWhiteSpace(worker.Ph_Number)) throw new Exception("Worker phone number is required.");
+            if (string.IsNullOrWhiteSpace(worker.Name)) throw new Exception("اسم العامل مطلوب.");
+            if (string.IsNullOrWhiteSpace(worker.Ph_Number)) throw new Exception("رقم هاتف العامل مطلوب.");
+
+            // Initialize the new property
+            worker.TotalPaidAmount = 0;
 
             await _workerRepo.AddAsync(worker);
             await _workerRepo.SaveChangesAsync();
@@ -66,30 +65,37 @@ namespace Application.Services
         // === PIECE (WORK ENTRY) ===
         // ==========================
 
-        public async Task AddWorkerPieceAsync(Worker worker, int pieces)
+        public async Task AddWorkerPieceAsync(Worker worker, int modelId, int pieces)
         {
             if (worker == null || pieces <= 0)
-                throw new Exception("Invalid worker or piece count.");
+                throw new Exception("عامل غير صالح أو عدد قطع غير صالح.");
 
-            var workerPiece = new WorkerPiece
+            var model = await _modelRepo.GetByIdAsync(modelId);
+            if (model == null)
+                throw new Exception("النموذج غير موجود.");
+
+            decimal totalAmount = pieces * model.MakingPrice;
+
+            var workerPiece = new WorkerPieceDetail
             {
                 WorkerID = worker.ID,
+                ModelID = modelId,
                 Pieces = pieces,
+                TotalAmount = totalAmount,
                 Date = DateTime.Now
             };
 
-            await _workerPieceRepo.AddAsync(workerPiece);
-            await _workerPieceRepo.SaveChangesAsync();
+            await _workerPieceDetailRepo.AddAsync(workerPiece);
+            await _workerPieceDetailRepo.SaveChangesAsync();
 
-            worker.Price_Count += pieces;
+            // Reload the worker to get fresh data and avoid duplicates
+            var updatedWorker = await GetWorkerByIdAsync(worker.ID);
 
-            if (worker.DailyPieces == null)
-                worker.DailyPieces = new ObservableCollection<WorkerPiece>();
-
-            worker.DailyPieces.Add(workerPiece);
-
-            _workerRepo.Update(worker);
-            await _workerRepo.SaveChangesAsync();
+            // Update the current worker object with fresh data
+            worker.Price_Count = updatedWorker.Price_Count;
+            worker.DailyPieces = updatedWorker.DailyPieces;
+            worker.BankTransactions = updatedWorker.BankTransactions;
+            worker.TotalPaidAmount = updatedWorker.TotalPaidAmount;
         }
 
         // ==========================
@@ -102,41 +108,81 @@ namespace Application.Services
                 throw new ArgumentNullException(nameof(worker));
 
             if (amount <= 0)
-                throw new Exception("Amount must be greater than zero.");
+                throw new Exception("يجب أن يكون المبلغ أكبر من الصفر.");
 
-            // Always OUTCOME (money leaving the bank)
-            var bank = await _bankService.GetOrCreateBankAsync();
+            // Use BankService to add transaction to bank
+            await _bankService.AddTransactionAsync(
+                description: $"{paymentType} - {worker.Name}",
+                amount: amount,
+                isIncome: false, // Payment to worker is always outcome from bank
+                workerId: worker.ID
+            );
 
-            if (bank.TotalAmount < amount)
-                throw new Exception("Not enough money in the bank.");
+            // Update the worker's TotalPaidAmount
+            worker.TotalPaidAmount += amount;
+            _workerRepo.Update(worker);
+            await _workerRepo.SaveChangesAsync();
 
-            decimal newTotal = bank.TotalAmount - amount;
-
-            var transaction = new BankTransaction
-            {
-                Date = DateTime.Now,
-                Type = "خارج",
-                Amount = amount,
-                TotalAfterTransaction = newTotal,
-                WorkerID = worker.ID,
-                BankID = bank.ID
-            };
-
-            bank.TotalAmount = newTotal;
-
-            await _transactionRepo.AddAsync(transaction);
-            _bankRepo.Update(bank);
-
-            await _transactionRepo.SaveChangesAsync();
-            await _bankRepo.SaveChangesAsync();
-
-            // Add to worker memory list
-            if (worker.BankTransactions == null)
-                worker.BankTransactions = new ObservableCollection<BankTransaction>();
-
-            worker.BankTransactions.Add(transaction);
-
+            // Reload worker with updated data
             return await GetWorkerByIdAsync(worker.ID);
+        }
+
+        // ==========================
+        // === RESET OPERATIONS ===
+        // ==========================
+
+        public async Task ResetWorkerRecordsAsync(Worker worker)
+        {
+            if (worker == null)
+                throw new ArgumentNullException(nameof(worker));
+
+            // Delete all piece records for this worker
+            var pieces = (await _workerPieceDetailRepo.GetAllAsync())
+                .Where(p => p.WorkerID == worker.ID)
+                .ToList();
+
+            foreach (var piece in pieces)
+            {
+                _workerPieceDetailRepo.Remove(piece);
+            }
+
+            // Reset worker's data
+            worker.Price_Count = 0;
+            worker.TotalPaidAmount = 0; // ✅ Reset the paid amount
+            worker.DailyPieces.Clear();
+
+            _workerRepo.Update(worker);
+            await _workerRepo.SaveChangesAsync();
+            await _workerPieceDetailRepo.SaveChangesAsync();
+        }
+
+        // ==========================
+        // === WEEKLY RESET OPERATIONS ===
+        // ==========================
+
+        public async Task ResetWeeklyWorkerRecordsAsync(Worker worker)
+        {
+            if (worker == null)
+                throw new ArgumentNullException(nameof(worker));
+
+            // Delete all piece records for this worker
+            var pieces = (await _workerPieceDetailRepo.GetAllAsync())
+                .Where(p => p.WorkerID == worker.ID)
+                .ToList();
+
+            foreach (var piece in pieces)
+            {
+                _workerPieceDetailRepo.Remove(piece);
+            }
+
+            // Reset worker's data
+            worker.Price_Count = 0;
+            worker.TotalPaidAmount = 0; // ✅ Reset the paid amount
+            worker.DailyPieces.Clear();
+
+            _workerRepo.Update(worker);
+            await _workerRepo.SaveChangesAsync();
+            await _workerPieceDetailRepo.SaveChangesAsync();
         }
     }
 }

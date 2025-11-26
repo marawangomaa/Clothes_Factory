@@ -1,15 +1,28 @@
-﻿using Clothes_System.ViewModels;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
 
 namespace Clothes_System.Views
 {
-    public partial class BankView : Page
+    /// <summary>
+    /// Interaction logic for BankUpdateView.xaml
+    /// </summary>
+    public partial class BankUpdateView : Page
     {
         private readonly BankViewModel _viewModel;
 
-        public BankView(BankViewModel viewModel)
+        public BankUpdateView(BankViewModel viewModel)
         {
             InitializeComponent();
             DataContext = viewModel;
@@ -30,4 +43,5 @@ namespace Clothes_System.Views
             main.Navigate(new MenuPage());
         }
     }
+
 }

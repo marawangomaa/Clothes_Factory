@@ -19,7 +19,8 @@ namespace Infrastructure.Data.EF
         public DbSet<Scissor> Scissors { get; set; }
         public DbSet<Bank> Banks { get; set; }
         public DbSet<Worker> Workers { get; set; }
-        public DbSet<WorkerPiece> WorkerPieces { get; set; }
+        //public DbSet<WorkerPiece> WorkerPieces { get; set; }
+        public DbSet<WorkerPieceDetail> WorkerPiecesDetails { get; set; }
 
         public DbSet<Material> Materials { get; set; }
         public DbSet<Storage> Storages { get; set; }
@@ -31,7 +32,7 @@ namespace Infrastructure.Data.EF
             modelBuilder.Entity<Bank>().HasData(new Bank
             {
                 ID = 1,
-                TotalAmount = 10000m
+                TotalAmount = 130000m
             });
 
             base.OnModelCreating(modelBuilder);

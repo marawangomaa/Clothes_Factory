@@ -21,11 +21,26 @@ namespace Clothes_System.ViewModels
         private Model _selectedModel;
         private decimal _meters;
         private decimal _totalMetersCut;
+        private int _selectedModelMetrag;
 
         public Model SelectedModel
         {
             get => _selectedModel;
-            set { _selectedModel = value; OnPropertyChanged(); }
+            set
+            {
+                _selectedModel = value;
+                OnPropertyChanged();
+
+                // ✅ Update the metrag when model is selected
+                if (_selectedModel != null)
+                {
+                    SelectedModelMetrag = _selectedModel.Metrag ?? 0;
+                }
+                else
+                {
+                    SelectedModelMetrag = 0;
+                }
+            }
         }
 
         public decimal Meters
@@ -39,6 +54,21 @@ namespace Clothes_System.ViewModels
             get => _totalMetersCut;
             set { _totalMetersCut = value; OnPropertyChanged(); }
         }
+
+        // ✅ Add this property to show selected model's metrag
+        public int SelectedModelMetrag
+        {
+            get => _selectedModelMetrag;
+            set
+            {
+                _selectedModelMetrag = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(SelectedModelMetragDisplay)); // Update display property
+            }
+        }
+
+        // ✅ Display property for the metrag
+        public string SelectedModelMetragDisplay => SelectedModelMetrag > 0 ? $"{SelectedModelMetrag} متر" : "---";
 
         public ICommand AddCutCommand { get; }
         public ICommand RefreshCommand { get; }
@@ -93,16 +123,18 @@ namespace Clothes_System.ViewModels
                 return;
             }
 
-            string modelName = SelectedModel.Name; // ✅ capture before await
+            string modelName = SelectedModel.Name;
+            int modelMetrag = SelectedModel.Metrag ?? 0; // ✅ Get the model's metrag
 
-            await _scissorService.AddCutAsync(modelName, Meters);
+            await _scissorService.AddCutAsync(modelName, modelMetrag, Meters);
             await LoadData();
 
             MessageBox.Show($"Cut added for model '{modelName}' ({Meters} meters).", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
+            // Reset form
             SelectedModel = null;
             Meters = 0;
+            SelectedModelMetrag = 0;
         }
-
     }
 }

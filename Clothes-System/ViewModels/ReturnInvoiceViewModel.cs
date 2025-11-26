@@ -24,6 +24,17 @@ namespace Clothes_System.ViewModels
 
         public ICommand SaveCommand { get; }
 
+        private string _errorMessage;
+        public string ErrorMessage
+        {
+            get => _errorMessage;
+            set
+            {
+                _errorMessage = value;
+                OnPropertyChanged(nameof(ErrorMessage));
+            }
+        }
+
         public MultiReturnInvoiceViewModel(int clientId, InvoiceService invoiceService, Action closeAction)
         {
             ClientId = clientId;
@@ -39,12 +50,19 @@ namespace Clothes_System.ViewModels
         {
             try
             {
+                ErrorMessage = "Loading items...";
                 var items = await _invoiceService.GetClientSellItemsAsync(ClientId);
-                if (items == null) return;
+
+                if (items == null || !items.Any())
+                {
+                    ErrorMessage = "No items found for this client";
+                    return;
+                }
 
                 ReturnItems.Clear();
 
                 var groupedItems = items
+                    .Where(i => i.Quantity > 0) // Only include items with available quantity
                     .GroupBy(i => i.ItemId)
                     .Select(g =>
                     {
@@ -70,10 +88,13 @@ namespace Clothes_System.ViewModels
                     ReturnItems.Add(dto);
 
                 OnPropertyChanged(nameof(TotalRefund));
+                ErrorMessage = ReturnItems.Any() ? string.Empty : "No returnable items found";
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed loading items: " + ex.Message);
+                ErrorMessage = $"Failed to load items: {ex.Message}";
+                MessageBox.Show($"Failed loading items: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -87,37 +108,52 @@ namespace Clothes_System.ViewModels
 
                 if (!selectedItems.Any())
                 {
-                    MessageBox.Show("No items selected to return");
+                    MessageBox.Show("Please select items to return", "Validation",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
+                }
+
+                // Validate return quantities
+                foreach (var item in selectedItems)
+                {
+                    if (item.ReturnQty > item.OriginalQty)
+                    {
+                        MessageBox.Show($"Return quantity for {item.ItemName} cannot exceed original quantity ({item.OriginalQty})",
+                            "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
                 }
 
                 decimal totalRefund = selectedItems.Sum(i => i.Total);
 
+                ErrorMessage = "Processing return...";
                 await _invoiceService.AddReturnInvoiceAsync(ClientId, selectedItems, totalRefund);
 
                 // ✅ Update OriginalQty after return
                 foreach (var item in selectedItems)
                 {
                     item.OriginalQty -= item.ReturnQty;
-                    item.OnPropertyChanged(nameof(item.OriginalQty)); // 🔹 Notify UI
                     item.ReturnQty = 0; // reset return qty
-                    item.OnPropertyChanged(nameof(item.ReturnQty));   // update Total too
                 }
 
                 OnPropertyChanged(nameof(TotalRefund));
                 (SaveCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
 
-                MessageBox.Show("Return Invoice Saved ✔");
+                MessageBox.Show($"Return invoice saved successfully! Refund amount: {totalRefund:C}", "Success",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+
+                _closeWindow?.Invoke();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                ErrorMessage = $"Error: {ex.Message}";
+                MessageBox.Show($"Failed to save return: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged(string name)
+        protected void OnPropertyChanged(string name = "")
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }

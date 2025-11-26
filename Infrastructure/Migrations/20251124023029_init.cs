@@ -48,6 +48,7 @@ namespace Infrastructure.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Number = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Model = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    ModelMetrag = table.Column<int>(type: "INTEGER", nullable: false),
                     Date = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -79,7 +80,8 @@ namespace Infrastructure.Migrations
                     Is_Weekly = table.Column<bool>(type: "INTEGER", nullable: false),
                     Ph_Number = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", maxLength: 150, nullable: false),
-                    Price_Count = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Price_Count = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalPaidAmount = table.Column<decimal>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -156,6 +158,7 @@ namespace Infrastructure.Migrations
                     Cost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Metrag = table.Column<int>(type: "INTEGER", nullable: true),
                     SellPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    MakingPrice = table.Column<decimal>(type: "TEXT", nullable: false),
                     Quantity = table.Column<int>(type: "INTEGER", nullable: false),
                     StorageID = table.Column<int>(type: "INTEGER", nullable: true),
                     Notes = table.Column<string>(type: "TEXT", nullable: true)
@@ -172,27 +175,6 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "WorkerPieces",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    WorkerID = table.Column<int>(type: "INTEGER", nullable: false),
-                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Pieces = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WorkerPieces", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_WorkerPieces_Workers_WorkerID",
-                        column: x => x.WorkerID,
-                        principalTable: "Workers",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "BankTransaction",
                 columns: table => new
                 {
@@ -202,6 +184,7 @@ namespace Infrastructure.Migrations
                     Type = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TotalAfterTransaction = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    RelatedTo = table.Column<string>(type: "TEXT", nullable: false),
                     InvoiceID = table.Column<int>(type: "INTEGER", nullable: true),
                     MaterialID = table.Column<int>(type: "INTEGER", nullable: true),
                     WorkerID = table.Column<int>(type: "INTEGER", nullable: true),
@@ -288,6 +271,35 @@ namespace Infrastructure.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "WorkerPiecesDetails",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    WorkerID = table.Column<int>(type: "INTEGER", nullable: false),
+                    ModelID = table.Column<int>(type: "INTEGER", nullable: false),
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Pieces = table.Column<int>(type: "INTEGER", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkerPiecesDetails", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_WorkerPiecesDetails_Models_ModelID",
+                        column: x => x.ModelID,
+                        principalTable: "Models",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_WorkerPiecesDetails_Workers_WorkerID",
+                        column: x => x.WorkerID,
+                        principalTable: "Workers",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "Banks",
                 columns: new[] { "ID", "TotalAmount" },
@@ -349,8 +361,13 @@ namespace Infrastructure.Migrations
                 column: "StorageID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WorkerPieces_WorkerID",
-                table: "WorkerPieces",
+                name: "IX_WorkerPiecesDetails_ModelID",
+                table: "WorkerPiecesDetails",
+                column: "ModelID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkerPiecesDetails_WorkerID",
+                table: "WorkerPiecesDetails",
                 column: "WorkerID");
         }
 
@@ -370,28 +387,28 @@ namespace Infrastructure.Migrations
                 name: "Scissors");
 
             migrationBuilder.DropTable(
-                name: "WorkerPieces");
+                name: "WorkerPiecesDetails");
 
             migrationBuilder.DropTable(
                 name: "Materials");
 
             migrationBuilder.DropTable(
-                name: "Models");
-
-            migrationBuilder.DropTable(
                 name: "Invoices");
 
             migrationBuilder.DropTable(
-                name: "Workers");
+                name: "Models");
 
             migrationBuilder.DropTable(
-                name: "Storages");
+                name: "Workers");
 
             migrationBuilder.DropTable(
                 name: "Banks");
 
             migrationBuilder.DropTable(
                 name: "Clintes");
+
+            migrationBuilder.DropTable(
+                name: "Storages");
         }
     }
 }

@@ -19,6 +19,8 @@ namespace Clothes_System
     {
         public static IServiceProvider ServiceProvider { get; private set; }
 
+        private System.Windows.Threading.DispatcherTimer _backupTimer;
+
         public App()
         {
             AppDomain.CurrentDomain.SetData("DataDirectory", AppContext.BaseDirectory);
@@ -71,6 +73,7 @@ namespace Clothes_System
             services.AddScoped<ModelService>();
             services.AddScoped<ScissorService>();
             services.AddScoped<InvoiceService>();
+            services.AddScoped<BackupService>();
 
             // ViewModels
             services.AddTransient<WorkerViewModel>();
@@ -100,11 +103,71 @@ namespace Clothes_System
 
         protected override async void OnStartup(StartupEventArgs e)
         {
-            base.OnStartup(e);
-            await SeedDatabaseAsync();
+            // Create error log immediately
+            System.IO.File.WriteAllText("debug_log.txt", $"=== APPLICATION START === {DateTime.Now}\n");
 
-            var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
-            mainWindow.Show();
+            try
+            {
+                System.IO.File.AppendAllText("debug_log.txt", $"Base Directory: {AppContext.BaseDirectory}\n");
+                System.IO.File.AppendAllText("debug_log.txt", $"Current Directory: {Environment.CurrentDirectory}\n");
+
+                base.OnStartup(e);
+                System.IO.File.AppendAllText("debug_log.txt", $"Base startup completed at {DateTime.Now}\n");
+
+                // Create initial backup on startup
+                await CreateInitialBackupAsync();
+                System.IO.File.AppendAllText("debug_log.txt", $"Backup completed at {DateTime.Now}\n");
+
+                // Seed database (this will now create tables)
+                await SeedDatabaseAsync();
+                System.IO.File.AppendAllText("debug_log.txt", $"Database seeded at {DateTime.Now}\n");
+
+                var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
+                System.IO.File.AppendAllText("debug_log.txt", $"Main window obtained at {DateTime.Now}\n");
+
+                mainWindow.Show();
+                System.IO.File.AppendAllText("debug_log.txt", $"Main window shown at {DateTime.Now}\n");
+
+                StartBackupScheduler();
+                System.IO.File.AppendAllText("debug_log.txt", $"Backup scheduler started at {DateTime.Now}\n");
+
+                System.IO.File.AppendAllText("debug_log.txt", $"=== APPLICATION STARTED SUCCESSFULLY === {DateTime.Now}\n");
+            }
+            catch (Exception ex)
+            {
+                System.IO.File.AppendAllText("debug_log.txt", $"=== CRASH === {DateTime.Now}\n");
+                System.IO.File.AppendAllText("debug_log.txt", $"Message: {ex.Message}\n");
+                System.IO.File.AppendAllText("debug_log.txt", $"Type: {ex.GetType().FullName}\n");
+                System.IO.File.AppendAllText("debug_log.txt", $"Stack Trace:\n{ex.StackTrace}\n");
+
+                if (ex.InnerException != null)
+                {
+                    System.IO.File.AppendAllText("debug_log.txt", $"Inner Exception: {ex.InnerException.Message}\n");
+                    System.IO.File.AppendAllText("debug_log.txt", $"Inner Stack Trace:\n{ex.InnerException.StackTrace}\n");
+                }
+
+                MessageBox.Show($"Application failed to start. Check debug_log.txt for details.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Shutdown();
+            }
+        }
+
+        private async Task CreateInitialBackupAsync()
+        {
+            try
+            {
+                using var scope = ServiceProvider.CreateScope();
+                var backupService = scope.ServiceProvider.GetRequiredService<BackupService>();
+                var result = await backupService.CreateBackupAsync();
+
+                if (result.Success)
+                    System.Diagnostics.Debug.WriteLine("Initial backup created successfully");
+                else
+                    System.Diagnostics.Debug.WriteLine($"Initial backup warning: {result.Message}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Initial backup failed: {ex.Message}");
+            }
         }
 
         private static async Task SeedDatabaseAsync()
@@ -116,35 +179,70 @@ namespace Clothes_System
             var connString = configuration.GetConnectionString("DefaultConnection");
 
             // Extract the SQLite file path
-            var dbFilePath = connString.Replace("Data Source=", "").Trim();
-            dbFilePath = Environment.ExpandEnvironmentVariables(dbFilePath);
+            connString = Environment.ExpandEnvironmentVariables(connString);
 
-            // Ensure folder exists
+            // Ensure folder exists - EXTRACT FILE PATH FIRST
+            var dbFilePath = connString.Replace("Data Source=", "").Trim();
             var folder = System.IO.Path.GetDirectoryName(dbFilePath);
             if (!System.IO.Directory.Exists(folder))
                 System.IO.Directory.CreateDirectory(folder);
 
             Console.WriteLine("DB will be created at: " + dbFilePath);
 
-            // Ensure DB is created
-            //await db.Database.EnsureCreatedAsync();
-
-            // Force a dummy query to open the connection
-            var _ = await db.Banks.CountAsync();
-
-            // Seed default Bank
-            if (!await db.Banks.AnyAsync())
+            try
             {
-                db.Banks.Add(new Bank
-                {
-                    TotalAmount = 10000m
-                });
-            }
+                // ✅ FIX: Apply database migrations first
+                System.IO.File.AppendAllText("debug_log.txt", "Applying database migrations...\n");
+                await db.Database.MigrateAsync();
+                System.IO.File.AppendAllText("debug_log.txt", "Database migrations applied successfully\n");
 
-            await db.SaveChangesAsync();
+                // ✅ Now check if we have any banks
+                System.IO.File.AppendAllText("debug_log.txt", "Checking if database needs seeding...\n");
+                var bankCount = await db.Banks.CountAsync();
+                System.IO.File.AppendAllText("debug_log.txt", $"Found {bankCount} banks in database\n");
+
+                // Seed default Bank only if empty
+                if (bankCount == 0)
+                {
+                    System.IO.File.AppendAllText("debug_log.txt", "Seeding default bank...\n");
+                    db.Banks.Add(new Bank
+                    {
+                        TotalAmount = 130000m
+                    });
+                    await db.SaveChangesAsync();
+                    System.IO.File.AppendAllText("debug_log.txt", "Default bank seeded successfully\n");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.IO.File.AppendAllText("debug_log.txt", $"Database error: {ex.Message}\n");
+                System.IO.File.AppendAllText("debug_log.txt", $"Stack trace: {ex.StackTrace}\n");
+                throw;
+            }
         }
 
+        private void StartBackupScheduler()
+        {
+            _backupTimer = new System.Windows.Threading.DispatcherTimer();
+            _backupTimer.Interval = TimeSpan.FromHours(24); // Run every 24 hours
+            _backupTimer.Tick += async (s, e) => await CreateDailyBackupAsync();
+            _backupTimer.Start();
+        }
 
+        private async Task CreateDailyBackupAsync()
+        {
+            try
+            {
+                using var scope = ServiceProvider.CreateScope();
+                var backupService = scope.ServiceProvider.GetRequiredService<BackupService>();
+                var result = await backupService.CreateBackupAsync();
 
+                System.Diagnostics.Debug.WriteLine($"Daily backup: {result.Message}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Daily backup failed: {ex.Message}");
+            }
+        }
     }
 }

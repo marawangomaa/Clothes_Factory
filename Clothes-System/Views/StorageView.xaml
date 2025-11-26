@@ -7,7 +7,8 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="المخزن"
       FlowDirection="RightToLeft"
-      Background="#F0F4F8">
+      Background="#F0F4F8"
+      FontSize="20">
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -18,12 +19,14 @@
         <!-- Header with Home Button -->
         <DockPanel Margin="0,0,0,15">
             <Button Content="🏠 العودة إلى الصفحة الرئيسية"
-                    Width="180" Height="35"
+                    Width="220" Height="45"
                     Background="#007ACC" Foreground="White" FontWeight="Bold"
+                    FontSize="20"
                     Click="Back_Click"
                     HorizontalAlignment="Left"/>
+
             <TextBlock Text="📦 المخزون" 
-                       FontSize="24" 
+                       FontSize="26" 
                        FontWeight="Bold" 
                        Foreground="#007ACC"
                        HorizontalAlignment="Center"
@@ -40,14 +43,15 @@
                   RowBackground="White"
                   GridLinesVisibility="Horizontal"
                   HeadersVisibility="Column"
-                  FontSize="14"
+                  FontSize="20"
                   HorizontalAlignment="Stretch"
                   Margin="0,0,0,0">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="الموديل" Binding="{Binding Product_Name}" Width="*" />
-                <DataGridTextColumn Header="النوع" Binding="{Binding Product_Type}" Width="150" />
-                <DataGridTextColumn Header="الكمية" Binding="{Binding Number_Of_Products}" Width="120" />
+                <DataGridTextColumn Header="النوع" Binding="{Binding Product_Type}" Width="180" />
+                <DataGridTextColumn Header="الكمية" Binding="{Binding Number_Of_Products}" Width="150" />
             </DataGrid.Columns>
         </DataGrid>
+
     </Grid>
 </Page>

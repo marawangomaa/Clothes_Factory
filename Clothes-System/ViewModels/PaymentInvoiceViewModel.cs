@@ -42,7 +42,19 @@ namespace Clothes_System.ViewModels
                 {
                     _amount = value;
                     OnPropertyChanged();
+                    (SaveCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
                 }
+            }
+        }
+
+        private string _errorMessage;
+        public string ErrorMessage
+        {
+            get => _errorMessage;
+            set
+            {
+                _errorMessage = value;
+                OnPropertyChanged();
             }
         }
 
@@ -54,7 +66,12 @@ namespace Clothes_System.ViewModels
             _invoiceService = invoiceService ?? throw new ArgumentNullException(nameof(invoiceService));
             _owner = owner ?? throw new ArgumentNullException(nameof(owner));
 
-            SaveCommand = new AsyncRelayCommand(Save);
+            SaveCommand = new AsyncRelayCommand(Save, CanSave);
+        }
+
+        private bool CanSave()
+        {
+            return Amount > 0;
         }
 
         private async Task Save()
@@ -63,22 +80,20 @@ namespace Clothes_System.ViewModels
             {
                 if (Amount <= 0)
                 {
-                    MessageBox.Show(
-                        "Please enter a valid amount greater than zero.",
-                        "Validation",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
+                    ErrorMessage = "Please enter a valid amount greater than zero.";
                     return;
                 }
+
+                ErrorMessage = "Processing payment...";
 
                 await _invoiceService.AddPaymentAsync(
                     _clientId,
                     Amount,
-                    SelectedPaymentMethod // <-- PAYMENT METHOD INCLUDED
+                    SelectedPaymentMethod
                 );
 
                 MessageBox.Show(
-                    "Payment recorded successfully.",
+                    $"Payment of {Amount:C} recorded successfully!",
                     "Success",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
@@ -87,9 +102,10 @@ namespace Clothes_System.ViewModels
             }
             catch (Exception ex)
             {
+                ErrorMessage = $"Payment failed: {ex.Message}";
                 MessageBox.Show(
                     $"Failed to save payment.\n\n{ex.Message}",
-                    "ERROR",
+                    "Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }

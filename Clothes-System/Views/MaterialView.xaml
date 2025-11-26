@@ -7,7 +7,8 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="المواد"
       Background="#F9FAFC"
-      FlowDirection="RightToLeft">
+      FlowDirection="RightToLeft"
+      FontSize="20">
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -18,7 +19,7 @@
         <!-- HEADER: Title centered + Home Button top-right -->
         <Grid Margin="0,0,0,15">
             <TextBlock Text="📦 إدارة المواد"
-                       FontSize="24"
+                       FontSize="28"
                        FontWeight="Bold"
                        Foreground="#2C3E50"
                        HorizontalAlignment="Center"
@@ -29,58 +30,69 @@
                     Background="#007ACC"
                     Foreground="White"
                     FontWeight="Bold"
-                    Padding="10,5"
+                    Padding="12,6"
                     HorizontalAlignment="Right"
-                    VerticalAlignment="Center"/>
+                    VerticalAlignment="Center"
+                    FontSize="20"/>
         </Grid>
 
         <!-- Add Material Section -->
         <StackPanel Orientation="Horizontal" Margin="0,0,0,15" VerticalAlignment="Top">
+
             <StackPanel Margin="0,0,10,0">
-                <TextBlock Text="اسم المادة" Foreground="Gray" FontSize="12"/>
-                <TextBox Width="150"
+                <TextBlock Text="اسم المادة" Foreground="Gray" FontSize="22"/>
+                <TextBox Width="150" Height="40" FontSize="20"
                          Text="{Binding NewMaterial.Name, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
 
             <StackPanel Margin="0,0,10,0">
-                <TextBlock Text="الكمية" Foreground="Gray" FontSize="12"/>
-                <TextBox Width="80" Text="{Binding NewMaterial.Quantity, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="الكمية" Foreground="Gray" FontSize="22"/>
+                <TextBox Width="100" Height="40" FontSize="20"
+                         Text="{Binding NewMaterial.Quantity, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
 
             <StackPanel Margin="0,0,10,0">
-                <TextBlock Text="الإجمالي" Foreground="Gray" FontSize="12"/>
-                <TextBox Width="100" Text="{Binding NewMaterial.TotalCost, UpdateSourceTrigger=PropertyChanged}"/>
-            </StackPanel>
+                <TextBlock Text="الإجمالي" Foreground="Gray" FontSize="22"/>
+                <TextBox Width="120" Height="40" FontSize="20"
+                         Text="{Binding NewMaterial.TotalCost, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}" 
+                         PreviewTextInput="Decimal_PreviewTextInput"/>
 
+            </StackPanel>
 
             <Button Content="شراء المادة"
                     Command="{Binding AddMaterialCommand}"
                     Background="#28A745"
                     Foreground="White"
-                    Padding="10,5"
+                    Padding="12,6"
                     FontWeight="Bold"
+                    FontSize="20"
                     BorderThickness="0"
                     Cursor="Hand"
-                    Margin="10,0,0,0"/>
+                    Margin="15,20,0,0"
+                    Width="150"
+                    Height="45"/>
         </StackPanel>
 
         <!-- Materials Purchase History -->
         <DataGrid Grid.Row="1"
                   ItemsSource="{Binding Materials}"
                   AutoGenerateColumns="False"
-                  Margin="0,0,0,0"
                   CanUserAddRows="False"
                   AlternatingRowBackground="#E6F0FA"
                   RowBackground="White"
                   HeadersVisibility="Column"
                   BorderBrush="#DDD"
-                  BorderThickness="1">
+                  BorderThickness="1"
+                  FontSize="20">
+
             <DataGrid.Columns>
-                <DataGridTextColumn Header="التاريخ" Binding="{Binding Date}" Width="150" />
+                <DataGridTextColumn Header="التاريخ" Binding="{Binding Date}" Width="180" />
                 <DataGridTextColumn Header="اسم المادة" Binding="{Binding Name}" Width="*" />
-                <DataGridTextColumn Header="الكمية" Binding="{Binding Quantity}" Width="100" />
-                <DataGridTextColumn Header="الإجمالي" Binding="{Binding TotalCost}" Width="120" />
+                <DataGridTextColumn Header="الكمية" Binding="{Binding Quantity}" Width="120" />
+                <DataGridTextColumn Header="الإجمالي" Binding="{Binding TotalCost}" Width="150" />
             </DataGrid.Columns>
+
         </DataGrid>
+
     </Grid>
 </Page>

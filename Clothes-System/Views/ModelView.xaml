@@ -18,71 +18,93 @@
         <!-- HEADER: Title + Home Button -->
         <Grid Margin="0,0,0,15">
             <TextBlock Text="📐 انشاء موديل"
-                       FontSize="24"
+                       FontSize="28"
                        FontWeight="Bold"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"/>
+
             <Button Content="🏠 العودة للصفحة الرئيسية"
                     Click="Back_Click"
                     Background="#007ACC"
                     Foreground="White"
                     FontWeight="Bold"
-                    Padding="8,4"
+                    FontSize="16"
+                    Padding="10,6"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"/>
         </Grid>
 
         <!-- ADD MODEL SECTION -->
-        <Border Grid.Row="1" Background="White" CornerRadius="10" Padding="15" BorderBrush="#DDD" BorderThickness="1" Margin="0,0,0,15">
+        <Border Grid.Row="1"
+                Background="White"
+                CornerRadius="10"
+                Padding="20"
+                BorderBrush="#DDD"
+                BorderThickness="1"
+                Margin="0,0,0,15">
+
             <StackPanel>
-                <TextBlock Text="إنشاء نموذج جديد" FontSize="18" FontWeight="Bold" Margin="0,0,0,10" />
+                <TextBlock Text="إنشاء نموذج جديد"
+                           FontSize="22"
+                           FontWeight="Bold"
+                           Margin="0,0,0,15"/>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center">
 
                     <StackPanel Margin="5">
-                        <TextBlock Text="الاسم" FontWeight="Bold" Margin="0,0,0,2"/>
-                        <TextBox Width="100" Text="{Binding Name}" />
+                        <TextBlock Text="الاسم" FontWeight="Bold" FontSize="16" Margin="0,0,0,3"/>
+                        <TextBox Width="120" FontSize="16" Text="{Binding Name}" />
                     </StackPanel>
 
                     <StackPanel Margin="5">
-                        <TextBlock Text="النوع" FontWeight="Bold" Margin="0,0,0,2"/>
-                        <TextBox Width="100" Text="{Binding Type}" />
+                        <TextBlock Text="النوع" FontWeight="Bold" FontSize="16" Margin="0,0,0,3"/>
+                        <TextBox Width="120" FontSize="16" Text="{Binding Type}" />
                     </StackPanel>
 
                     <StackPanel Margin="5">
-                        <TextBlock Text="الكود" FontWeight="Bold" Margin="0,0,0,2"/>
-                        <TextBox Width="100" Text="{Binding Code}" />
+                        <TextBlock Text="الكود" FontWeight="Bold" FontSize="16" Margin="0,0,0,3"/>
+                        <TextBox Width="120" FontSize="16" Text="{Binding Code}" />
                     </StackPanel>
 
                     <StackPanel Margin="5">
-                        <TextBlock Text="المتراج" FontWeight="Bold" Margin="0,0,0,2"/>
-                        <TextBox Width="100" Text="{Binding Metrag}" />
+                        <TextBlock Text="المتراج" FontWeight="Bold" FontSize="16" Margin="0,0,0,3"/>
+                        <TextBox Width="120" FontSize="16" Text="{Binding Metrag}" />
                     </StackPanel>
 
                     <StackPanel Margin="5">
-                        <TextBlock Text="التكلفة" FontWeight="Bold" Margin="0,0,0,2"/>
-                        <TextBox Width="100" Text="{Binding Cost}" />
+                        <TextBlock Text="تكلفة العامل" FontWeight="Bold" FontSize="16" Margin="0,0,0,3"/>
+                        <TextBox Width="120" FontSize="16" Text="{Binding MakingPrice}" />
                     </StackPanel>
 
                     <StackPanel Margin="5">
-                        <TextBlock Text="سعر البيع" FontWeight="Bold" Margin="0,0,0,2"/>
-                        <TextBox Width="100" Text="{Binding SellPrice}" />
+                        <TextBlock Text="التكلفة" FontWeight="Bold" FontSize="16" Margin="0,0,0,3"/>
+                        <TextBox Width="120" FontSize="16" Text="{Binding Cost}" />
+                    </StackPanel>
+
+                    <StackPanel Margin="5">
+                        <TextBlock Text="سعر البيع" FontWeight="Bold" FontSize="16" Margin="0,0,0,3"/>
+                        <TextBox Width="120" FontSize="16" Text="{Binding SellPrice}" />
                     </StackPanel>
 
                     <Button Content="إضافة"
-                    Command="{Binding AddModelCommand}"
-                    Width="80"
-                    Margin="5"
-                    Background="#28A745"
-                    Foreground="White"
-                    BorderThickness="0"
-                    Padding="4,2"
-                    FontWeight="Bold"
-                    Cursor="Hand">
+                            Command="{Binding AddModelCommand}"
+                            Width="100"
+                            Margin="10,5,5,5"
+                            Background="#28A745"
+                            Foreground="White"
+                            BorderThickness="0"
+                            Padding="8,4"
+                            FontWeight="Bold"
+                            FontSize="16"
+                            Cursor="Hand">
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
-                                <Border Background="{TemplateBinding Background}" CornerRadius="5">
-                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <Border Background="{TemplateBinding Background}"
+                                        CornerRadius="6">
+                                    <ContentPresenter HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"/>
                                 </Border>
                             </ControlTemplate>
                         </Button.Template>
@@ -102,62 +124,90 @@
                   RowBackground="White"
                   CanUserAddRows="False"
                   CanUserDeleteRows="False"
-                  SelectionChanged="DataGrid_SelectionChanged">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="الاسم" Binding="{Binding Name}" Width="100"/>
-                <DataGridTextColumn Header="النوع" Binding="{Binding Type}" Width="100"/>
-                <DataGridTextColumn Header="الكود" Binding="{Binding Code}" Width="100"/>
-                <DataGridTextColumn Header="التكلفة" Binding="{Binding Cost}" Width="100"/>
-                <DataGridTextColumn Header="المتراج" Binding="{Binding Metrag}" Width="100"/>
-                <DataGridTextColumn Header="سعر البيع" Binding="{Binding SellPrice}" Width="100"/>
-                <DataGridTextColumn Header="الكمية" Binding="{Binding Quantity}" Width="100"/>
-                <DataGridTextColumn Header="ملاحظات" Binding="{Binding Notes}" Width="100"/>
+                  FontSize="16"
+                  SelectionChanged="DataGrid_SelectionChanged"
+                  CellEditEnding="DataGrid_CellEditEnding">
 
-                <DataGridTemplateColumn Header="الإجراءات" Width="250">
+            <DataGrid.Resources>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="FontSize" Value="18"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </Style>
+            </DataGrid.Resources>
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="الرقم" Binding="{Binding ID}" Width="40"/>
+                <DataGridTextColumn Header="الاسم" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+                <DataGridTextColumn Header="النوع" Binding="{Binding Type, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+                <DataGridTextColumn Header="الكود" Binding="{Binding Code, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+                <DataGridTextColumn Header="التكلفة" Binding="{Binding Cost, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+                <DataGridTextColumn Header="المتراج" Binding="{Binding Metrag, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+                <DataGridTextColumn Header="تكلفة العامل" Binding="{Binding MakingPrice, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+                <DataGridTextColumn Header="سعر البيع" Binding="{Binding SellPrice, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+                <DataGridTextColumn Header="الكمية" Binding="{Binding Quantity}" Width="120" IsReadOnly="True"/>
+
+                <!-- Notes Column with Clickable TextBlock -->
+                <DataGridTemplateColumn Header="ملاحظات" Width="200">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Notes}" 
+                                       TextWrapping="Wrap"
+                                       MaxWidth="180"
+                                       Cursor="Hand"
+                                       ToolTip="انقر لتعديل الملاحظات"
+                                       MouseDown="NotesTextBlock_MouseDown">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Notes}" Value="{x:Null}">
+                                                <Setter Property="Text" Value="انقر لإضافة ملاحظات"/>
+                                                <Setter Property="Foreground" Value="Gray"/>
+                                                <Setter Property="FontStyle" Value="Italic"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Notes}" Value="">
+                                                <Setter Property="Text" Value="انقر لإضافة ملاحظات"/>
+                                                <Setter Property="Foreground" Value="Gray"/>
+                                                <Setter Property="FontStyle" Value="Italic"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="الإجراءات" Width="280">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <Button Content="إضافة 10 قطع"
-                                        Command="{Binding DataContext.AddPiecesCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                        CommandParameter="{Binding}"
-                                        Width="120"
-                                        Margin="0,0,5,0"
-                                        Background="#007ACC"
-                                        Foreground="White"
-                                        BorderThickness="0"
-                                        Padding="4,2"
-                                        Cursor="Hand">
-                                    <Button.Template>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}" CornerRadius="4">
-                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Button.Template>
-                                </Button>
 
                                 <Button Content="عرض التفاصيل"
                                         Command="{Binding DataContext.ViewDetailsCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                         CommandParameter="{Binding}"
-                                        Width="100"
+                                        Width="240"
                                         Background="#28A745"
                                         Foreground="White"
                                         BorderThickness="0"
-                                        Padding="4,2"
+                                        Padding="6,3"
+                                        FontSize="15"
                                         Cursor="Hand">
                                     <Button.Template>
                                         <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="5">
                                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                             </Border>
                                         </ControlTemplate>
                                     </Button.Template>
                                 </Button>
+
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+
             </DataGrid.Columns>
         </DataGrid>
+
     </Grid>
 </Page>

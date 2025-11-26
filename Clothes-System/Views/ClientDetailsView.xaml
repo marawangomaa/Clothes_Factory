@@ -3,7 +3,8 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       Title="تفاصيل العميل"
       FlowDirection="RightToLeft"
-      Background="#F0F4F8">
+      Background="#F0F4F8"
+      FontSize="20">
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -21,21 +22,21 @@
 
             <!-- Back to Home Button (Top-Right) -->
             <Button Content="العودة إلى صفحة العملاء"
-                    Width="200" Height="40"
+                    Width="240" Height="48"
                     Background="#007ACC" Foreground="White" FontWeight="Bold"
                     HorizontalAlignment="Right"
                     Click="Back_Click"/>
 
             <!-- Client Info (Left side of the top bar) -->
             <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0">
-                <TextBlock Text="العميل:" FontWeight="Bold" Margin="0,0,8,0"/>
-                <TextBlock Text="{Binding Client.Name}" Margin="0,0,16,0"/>
+                <TextBlock Text="العميل:" FontWeight="Bold" Margin="0,0,8,0" FontSize="22"/>
+                <TextBlock Text="{Binding Client.Name}" Margin="0,0,16,0" FontSize="22"/>
 
-                <TextBlock Text="رقم الهاتف:" FontWeight="Bold" Margin="0,0,8,0"/>
-                <TextBlock Text="{Binding Client.Ph_Number}" Margin="0,0,16,0"/>
+                <TextBlock Text="رقم الهاتف:" FontWeight="Bold" Margin="0,0,8,0" FontSize="22"/>
+                <TextBlock Text="{Binding Client.Ph_Number}" Margin="0,0,16,0" FontSize="22"/>
 
-                <TextBlock Text="الدين:" FontWeight="Bold" Margin="0,0,8,0"/>
-                <TextBlock Text="{Binding Client.Debt}" Foreground="DarkRed"/>
+                <TextBlock Text="الدين:" FontWeight="Bold" Margin="0,0,8,0" FontSize="22"/>
+                <TextBlock Text="{Binding Client.Debt}" Foreground="DarkRed" FontSize="22"/>
             </StackPanel>
         </Grid>
 
@@ -47,11 +48,12 @@
                   Margin="0,0,0,8"
                   AlternatingRowBackground="#E6F0FA"
                   RowBackground="White"
-                  MouseDoubleClick="InvoicesDataGrid_MouseDoubleClick">
+                  MouseDoubleClick="InvoicesDataGrid_MouseDoubleClick"
+                  FontSize="20">
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="النوع" Binding="{Binding Type}" Width="100"/>
-                <DataGridTextColumn Header="طريقة الدفع" Binding="{Binding PaymentMethod}" Width="120"/>
+                <DataGridTextColumn Header="النوع" Binding="{Binding Type}" Width="110"/>
+                <DataGridTextColumn Header="طريقة الدفع" Binding="{Binding PaymentMethod}" Width="140"/>
 
                 <DataGridTemplateColumn Header="النماذج" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
@@ -60,13 +62,13 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
-                                            <TextBlock Text="{Binding ModelName}" Width="120"/>
-                                            <TextBlock Text=" × " />
-                                            <TextBlock Text="{Binding Quantity}" Width="50"/>
-                                            <TextBlock Text=" @ " />
-                                            <TextBlock Text="{Binding UnitPrice}" Width="80"/>
-                                            <TextBlock Text=" = " />
-                                            <TextBlock Text="{Binding Total}" Width="80"/>
+                                            <TextBlock Text="{Binding ModelName}" Width="150" FontSize="20"/>
+                                            <TextBlock Text=" × " FontSize="20"/>
+                                            <TextBlock Text="{Binding Quantity}" Width="60" FontSize="20"/>
+                                            <TextBlock Text=" @ " FontSize="20"/>
+                                            <TextBlock Text="{Binding UnitPrice}" Width="100" FontSize="20"/>
+                                            <TextBlock Text=" = " FontSize="20"/>
+                                            <TextBlock Text="{Binding Total}" Width="100" FontSize="20"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -75,19 +77,20 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn Header="الإجمالي" Binding="{Binding TotalAmount}" Width="100"/>
-                <DataGridTextColumn Header="المدفوع" Binding="{Binding PaidAmount}" Width="100"/>
-                <DataGridTextColumn Header="المتبقي" Binding="{Binding RemainingAmount}" Width="100"/>
+                <DataGridTextColumn Header="الإجمالي" Binding="{Binding TotalAmount}" Width="130"/>
+                <DataGridTextColumn Header="المدفوع" Binding="{Binding PaidAmount}" Width="130"/>
+                <DataGridTextColumn Header="المتبقي" Binding="{Binding RemainingAmount}" Width="130"/>
 
-                <DataGridTemplateColumn Header="التاريخ" Width="160">
+                <DataGridTemplateColumn Header="التاريخ" Width="180">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Date, StringFormat={}{0:dd/MM/yyyy HH:mm}}"/>
+                            <TextBlock Text="{Binding Date, StringFormat={}{0:dd/MM/yyyy HH:mm}}" FontSize="20"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <DatePicker SelectedDate="{Binding Date, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <DatePicker SelectedDate="{Binding Date, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        FontSize="20"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
@@ -99,12 +102,18 @@
                     Orientation="Horizontal"
                     HorizontalAlignment="Center"
                     Margin="0,12,0,0">
-            <Button Content="فاتورة جديدة" Width="120" Margin="8" Background="#28A745" Foreground="White"
+            <Button Content="فاتورة جديدة" Width="150" Height="48" Margin="8" Background="#28A745" Foreground="White"
+                    FontSize="20"
                     Command="{Binding OpenSellInvoiceCommand}" />
-            <Button Content="إرجاع" Width="120" Margin="8" Background="#FFC107" Foreground="White"
+
+            <Button Content="إرجاع" Width="150" Height="48" Margin="8" Background="#FFC107" Foreground="White"
+                    FontSize="20"
                     Command="{Binding OpenReturnInvoiceCommand}" />
-            <Button Content="سداد" Width="120" Margin="8" Background="#17A2B8" Foreground="White"
+
+            <Button Content="سداد" Width="150" Height="48" Margin="8" Background="#17A2B8" Foreground="White"
+                    FontSize="20"
                     Command="{Binding OpenPaymentInvoiceCommand}" />
         </StackPanel>
+
     </Grid>
 </Page>

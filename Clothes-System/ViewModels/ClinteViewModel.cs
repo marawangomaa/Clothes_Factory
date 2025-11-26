@@ -2,13 +2,13 @@
 using Clothes_System.Helpers;
 using Clothes_System.Views;
 using Domain.Entities;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using System.Windows.Controls;
+using System.Windows;
 using System.Windows.Input;
-using System.Windows.Navigation;
 
 namespace Clothes_System.ViewModels
 {
@@ -30,7 +30,12 @@ namespace Clothes_System.ViewModels
         public Clinte SelectedClinte
         {
             get => _selectedClinte;
-            set { _selectedClinte = value; OnPropertyChanged(); }
+            set
+            {
+                _selectedClinte = value;
+                OnPropertyChanged();
+                // CommandManager will automatically refresh commands due to property change
+            }
         }
 
         public ICommand LoadClientsCommand { get; }
@@ -47,59 +52,145 @@ namespace Clothes_System.ViewModels
             LoadClientsCommand = new AsyncRelayCommand(LoadClientsAsync);
             AddClinteCommand = new AsyncRelayCommand(AddClinteAsync);
             EditClinteCommand = new AsyncRelayCommand(EditClinteAsync);
-            DeleteClinteCommand = new AsyncRelayCommand(DeleteClinteAsync);
+            DeleteClinteCommand = new RelayCommand(DeleteClinte, CanDeleteClinte);
             OpenDetailsCommand = new RelayCommand(OpenDetails, CanOpenDetails);
 
             _ = LoadClientsAsync();
         }
 
-        private bool CanOpenDetails(object? obj)
+        private bool CanOpenDetails(object obj)
         {
             return SelectedClinte != null;
         }
 
-        private void OpenDetails(object? obj)
+        private bool CanDeleteClinte(object obj)
         {
+            return SelectedClinte != null;
+        }
+
+        private void OpenDetails(object obj)
+        {
+            if (SelectedClinte == null)
+            {
+                MessageBox.Show("يرجى اختيار عميل أولاً", "تحذير", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             var page = new ClientDetailsView(SelectedClinte);
-
-            var frame = System.Windows.Application.Current.MainWindow.FindName("MainFrame")
-                         as System.Windows.Controls.Frame;
-
+            var frame = System.Windows.Application.Current.MainWindow.FindName("MainFrame") as System.Windows.Controls.Frame;
             frame?.Navigate(page);
         }
 
         private async Task LoadClientsAsync()
         {
-            Clintes.Clear();
-            var clients = await _clinteService.GetAllClinetsAsync();
-            foreach (var c in clients)
-                Clintes.Add(c);
+            try
+            {
+                Clintes.Clear();
+                var clients = await _clinteService.GetAllClinetsAsync();
+                foreach (var c in clients)
+                    Clintes.Add(c);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"خطأ في تحميل العملاء: {ex.Message}", "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private async Task AddClinteAsync()
         {
-            if (NewClinte == null ||
-                string.IsNullOrWhiteSpace(NewClinte.Name) ||
-                string.IsNullOrWhiteSpace(NewClinte.Ph_Number))
-                return;
+            try
+            {
+                if (NewClinte == null ||
+                    string.IsNullOrWhiteSpace(NewClinte.Name) ||
+                    string.IsNullOrWhiteSpace(NewClinte.Ph_Number) ||
+                    string.IsNullOrWhiteSpace(NewClinte.Location))
+                {
+                    MessageBox.Show("يرجى ملء جميع الحقول المطلوبة", "تحذير", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
 
-            await _clinteService.AddClinteAsync(NewClinte);
-            await LoadClientsAsync();
-            NewClinte = new Clinte();
+                var result = await _clinteService.AddClinteAsync(NewClinte);
+
+                if (result.Success)
+                {
+                    MessageBox.Show(result.Message, "نجاح", MessageBoxButton.OK, MessageBoxImage.Information);
+                    await LoadClientsAsync();
+                    NewClinte = new Clinte();
+                }
+                else
+                {
+                    MessageBox.Show(result.Message, "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"خطأ في إضافة العميل: {ex.Message}", "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private async Task EditClinteAsync()
         {
-            if (SelectedClinte == null) return;
-            await _clinteService.UpdateClinteAsync(SelectedClinte);
-            await LoadClientsAsync();
+            if (SelectedClinte == null)
+            {
+                MessageBox.Show("يرجى اختيار عميل أولاً", "تحذير", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                var result = await _clinteService.UpdateClinteAsync(SelectedClinte);
+
+                if (result.Success)
+                {
+                    MessageBox.Show(result.Message, "نجاح", MessageBoxButton.OK, MessageBoxImage.Information);
+                    await LoadClientsAsync();
+                }
+                else
+                {
+                    MessageBox.Show(result.Message, "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"خطأ في تعديل العميل: {ex.Message}", "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
-        private async Task DeleteClinteAsync()
+        private async void DeleteClinte(object obj)
         {
-            if (SelectedClinte == null) return;
-            await _clinteService.DeleteClinteAsync(SelectedClinte);
-            await LoadClientsAsync();
+            if (SelectedClinte == null)
+            {
+                MessageBox.Show("يرجى اختيار عميل أولاً", "تحذير", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                var result = MessageBox.Show(
+                    $"هل أنت متأكد من حذف العميل '{SelectedClinte.Name}'؟",
+                    "تأكيد الحذف",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    var deleteResult = await _clinteService.DeleteClinteAsync(SelectedClinte);
+
+                    if (deleteResult.Success)
+                    {
+                        MessageBox.Show(deleteResult.Message, "نجاح", MessageBoxButton.OK, MessageBoxImage.Information);
+                        await LoadClientsAsync();
+                    }
+                    else
+                    {
+                        MessageBox.Show(deleteResult.Message, "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"خطأ في حذف العميل: {ex.Message}", "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

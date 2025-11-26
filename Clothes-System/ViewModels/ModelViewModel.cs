@@ -20,6 +20,7 @@ namespace Clothes_System.ViewModels
         private string _type;
         private string _code;
         private int _metrag;
+        private decimal _makingPrice;
         private decimal _cost;
         private decimal _sellPrice;
         private string _image;
@@ -28,6 +29,7 @@ namespace Clothes_System.ViewModels
         public string Type { get => _type; set { _type = value; OnPropertyChanged(); } }
         public string Code { get => _code; set { _code = value; OnPropertyChanged(); } }
         public int Metrag { get => _metrag; set { _metrag = value; OnPropertyChanged(); } }
+        public decimal MakingPrice { get => _makingPrice; set { _makingPrice = value; OnPropertyChanged(); } }
         public decimal Cost { get => _cost; set { _cost = value; OnPropertyChanged(); } }
         public decimal SellPrice { get => _sellPrice; set { _sellPrice = value; OnPropertyChanged(); } }
         public string Image { get => _image; set { _image = value; OnPropertyChanged(); } }
@@ -36,7 +38,8 @@ namespace Clothes_System.ViewModels
         public ICommand RefreshCommand { get; }
         public ICommand AddPiecesCommand { get; }
         public ICommand ViewDetailsCommand { get; }
-
+        public ICommand EditNotesCommand { get; }
+        public ICommand UpdateModelCommand { get; }
 
         public ModelViewModel(ModelService modelService)
         {
@@ -45,16 +48,45 @@ namespace Clothes_System.ViewModels
             RefreshCommand = new RelayCommand(async _ => await LoadModels());
             AddPiecesCommand = new RelayCommand<Model>(async m => await AddPieces(m));
             ViewDetailsCommand = new RelayCommand<Model>(OpenDetailsWindow);
+            EditNotesCommand = new RelayCommand<Model>(async m => await EditNotes(m));
+            UpdateModelCommand = new RelayCommand<Model>(async m => await UpdateModel(m));
 
-            // 🔄 Load models initially
             _ = LoadModels();
         }
+
         private void OpenDetailsWindow(Model model)
         {
             if (model == null) return;
 
             var detailsWindow = new Views.ModelDetailsWindow(model);
             detailsWindow.ShowDialog();
+            _ = LoadModels();
+        }
+
+        private async Task EditNotes(Model model)
+        {
+            if (model == null) return;
+
+            var notesWindow = new Views.ModelNotesWindow(model, _modelService);
+            notesWindow.ShowDialog();
+            _ = LoadModels();
+        }
+
+        private async Task UpdateModel(Model model)
+        {
+            if (model == null) return;
+
+            try
+            {
+                await _modelService.UpdateModelAsync(model);
+                await LoadModels();
+            }
+            catch (Exception ex)
+            {
+                // Handle exception (show message to user)
+                System.Windows.MessageBox.Show($"Error updating model: {ex.Message}", "Error",
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
         }
 
         private async Task LoadModels()
@@ -65,29 +97,51 @@ namespace Clothes_System.ViewModels
 
         private async Task AddModel()
         {
-            var model = new Model
+            try
             {
-                Name = Name,
-                Type = Type,
-                Code = Code,
-                Metrag = Metrag,
-                Cost = Cost,
-                SellPrice = SellPrice,
-                Image = Image,
-                Quantity = 0, // Initially 0, but it will be linked to storage
-                StorageID = null // Initially null, will be handled below
-            };
+                var model = new Model
+                {
+                    Name = Name,
+                    Type = Type,
+                    Code = Code,
+                    Metrag = Metrag,
+                    MakingPrice = MakingPrice,
+                    Cost = Cost,
+                    SellPrice = SellPrice,
+                    Image = Image,
+                    Quantity = 0,
+                    StorageID = null
+                };
 
-            // Add the model using the updated AddModelAsync in the service
-            await _modelService.AddModelAsync(model);
+                await _modelService.AddModelAsync(model);
 
-            // Reload models after adding
-            await LoadModels();
+                // Clear the form after successful addition
+                ClearForm();
+
+                await LoadModels();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Error adding model: {ex.Message}", "Error",
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
+        }
+
+        private void ClearForm()
+        {
+            Name = string.Empty;
+            Type = string.Empty;
+            Code = string.Empty;
+            Metrag = 0;
+            MakingPrice = 0;
+            Cost = 0;
+            SellPrice = 0;
+            Image = string.Empty;
         }
 
         private async Task AddPieces(Model model)
         {
-            await _modelService.UpdateQuantityAsync(model.ID, 10); // e.g. +10 pieces
+            await _modelService.UpdateQuantityAsync(model.ID, 10);
             await LoadModels();
         }
     }

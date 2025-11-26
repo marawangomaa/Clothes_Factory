@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ClothesSystemDbContext))]
-    [Migration("20251121003736_init")]
+    [Migration("20251124023029_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -61,6 +61,10 @@ namespace Infrastructure.Migrations
 
                     b.Property<int?>("MaterialID")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("RelatedTo")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("TotalAfterTransaction")
                         .HasColumnType("decimal(18,2)");
@@ -255,6 +259,9 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal>("MakingPrice")
+                        .HasColumnType("TEXT");
+
                     b.Property<int?>("Metrag")
                         .HasColumnType("INTEGER");
 
@@ -299,6 +306,9 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("ModelMetrag")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Number")
                         .IsRequired()
@@ -355,12 +365,15 @@ namespace Infrastructure.Migrations
                     b.Property<decimal>("Price_Count")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<decimal>("TotalPaidAmount")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("ID");
 
                     b.ToTable("Workers");
                 });
 
-            modelBuilder.Entity("Domain.Entities.WorkerPiece", b =>
+            modelBuilder.Entity("Domain.Entities.WorkerPieceDetail", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -369,17 +382,25 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("ModelID")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Pieces")
                         .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("WorkerID")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ID");
 
+                    b.HasIndex("ModelID");
+
                     b.HasIndex("WorkerID");
 
-                    b.ToTable("WorkerPieces");
+                    b.ToTable("WorkerPiecesDetails");
                 });
 
             modelBuilder.Entity("Domain.Entities.BankTransaction", b =>
@@ -492,13 +513,21 @@ namespace Infrastructure.Migrations
                     b.Navigation("Storage");
                 });
 
-            modelBuilder.Entity("Domain.Entities.WorkerPiece", b =>
+            modelBuilder.Entity("Domain.Entities.WorkerPieceDetail", b =>
                 {
+                    b.HasOne("Domain.Entities.Model", "Model")
+                        .WithMany()
+                        .HasForeignKey("ModelID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.Worker", "Worker")
                         .WithMany("DailyPieces")
                         .HasForeignKey("WorkerID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Model");
 
                     b.Navigation("Worker");
                 });

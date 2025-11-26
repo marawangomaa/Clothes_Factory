@@ -13,22 +13,20 @@ namespace Infrastructure.Data.EF
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-            // Get SQLite file path
             var connString = configuration.GetConnectionString("DefaultConnection");
-            var dbFilePath = connString.Replace("Data Source=", "").Trim();
-            dbFilePath = Environment.ExpandEnvironmentVariables(dbFilePath);
+            connString = Environment.ExpandEnvironmentVariables(connString);
 
-            // Ensure folder exists
+            // Ensure folder exists - EXTRACT FILE PATH FIRST
+            var dbFilePath = connString.Replace("Data Source=", "").Trim();
             var folder = System.IO.Path.GetDirectoryName(dbFilePath);
             if (!System.IO.Directory.Exists(folder))
                 System.IO.Directory.CreateDirectory(folder);
 
             var optionsBuilder = new DbContextOptionsBuilder<ClothesSystemDbContext>();
-            optionsBuilder.UseSqlite(dbFilePath);
+            optionsBuilder.UseSqlite(connString);
 
             return new ClothesSystemDbContext(optionsBuilder.Options);
         }
-
     }
 
 }

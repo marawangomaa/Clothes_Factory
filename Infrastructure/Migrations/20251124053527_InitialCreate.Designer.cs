@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ClothesSystemDbContext))]
-    partial class ClothesSystemDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251124053527_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
@@ -34,7 +37,7 @@ namespace Infrastructure.Migrations
                         new
                         {
                             ID = 1,
-                            TotalAmount = 130000m
+                            TotalAmount = 10000m
                         });
                 });
 

@@ -15,22 +15,21 @@ namespace Application.Services
     {
         private readonly IRepository<Model> _modelRepository;
         private readonly IRepository<Storage> _storageRepository;
-        private readonly StorageService _storageService; // Injecting StorageService
+        private readonly StorageService _storageService;
+        public event EventHandler ModelsChanged;
 
         public ModelService(IRepository<Model> modelRepository, IRepository<Storage> storageRepository, StorageService storageService)
         {
             _modelRepository = modelRepository;
             _storageRepository = storageRepository;
-            _storageService = storageService; // Initializing StorageService
+            _storageService = storageService;
         }
 
         public async Task<ObservableCollection<Model>> GetAllModelsAsync()
         {
             var dbContext = (ClothesSystemDbContext)_modelRepository.GetDbContext();
-
-            // Ensure we actually query the database directly
             var models = await dbContext.Models
-                .Include(m => m.Storage) // optional: include related data if needed
+                .Include(m => m.Storage)
                 .ToListAsync();
 
             return new ObservableCollection<Model>(models);
@@ -38,26 +37,58 @@ namespace Application.Services
 
         public async Task AddModelAsync(Model model)
         {
-            // Use StorageService to add or update storage
-            var productName = model.Name; // Assuming model's name is used for storage
-            var productType = model.Type; // Assuming model's type is used for storage
+            var productName = model.Name;
+            var productType = model.Type;
 
-            // Add or update storage through the StorageService
             await _storageService.AddOrUpdateStorageAsync(productName, productType, model.Quantity.GetValueOrDefault());
 
-            // Fetch the updated storage (now the ID should be set)
             var storage = await _storageRepository.GetFirstOrDefaultAsync(s => s.Product_Name == productName);
 
-            // Now that the storage exists (or is updated), assign the storage ID to the model
             model.StorageID = storage.ID;
 
-            // Add the model to the repository
             await _modelRepository.AddAsync(model);
-            await _modelRepository.SaveChangesAsync(); // Save the model to the database
+            await _modelRepository.SaveChangesAsync();
 
-            // Update the storage count based on the model quantity
             storage.Number_Of_Products += model.Quantity.GetValueOrDefault();
-            await _storageRepository.SaveChangesAsync(); // Save the updated storage
+            await _storageRepository.SaveChangesAsync();
+
+            ModelsChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        public async Task UpdateModelAsync(Model model)
+        {
+            var dbContext = (ClothesSystemDbContext)_modelRepository.GetDbContext();
+            var existingModel = await dbContext.Models
+                .Include(m => m.Storage)
+                .FirstOrDefaultAsync(m => m.ID == model.ID);
+
+            if (existingModel == null)
+                throw new Exception("Model not found.");
+
+            // Update model properties
+            existingModel.Name = model.Name;
+            existingModel.Type = model.Type;
+            existingModel.Code = model.Code;
+            existingModel.Metrag = model.Metrag;
+            existingModel.MakingPrice = model.MakingPrice;
+            existingModel.Cost = model.Cost;
+            existingModel.SellPrice = model.SellPrice;
+            existingModel.Image = model.Image;
+
+            // Update storage if name or type changed
+            if (existingModel.Storage != null &&
+                (existingModel.Storage.Product_Name != model.Name ||
+                 existingModel.Storage.Product_Type != model.Type))
+            {
+                existingModel.Storage.Product_Name = model.Name;
+                existingModel.Storage.Product_Type = model.Type;
+                dbContext.Storages.Update(existingModel.Storage);
+            }
+
+            dbContext.Models.Update(existingModel);
+            await dbContext.SaveChangesAsync();
+
+            ModelsChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public async Task<Storage> GetStorageAsync()
@@ -68,6 +99,7 @@ namespace Application.Services
         public async Task AddStorageAsync(Storage storage)
         {
             await _storageRepository.AddAsync(storage);
+            ModelsChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public async Task UpdateQuantityAsync(int modelId, int addedQuantity)
@@ -84,12 +116,10 @@ namespace Application.Services
             if (model == null)
                 throw new Exception("Model not found.");
 
-            // Update model quantity
             model.Quantity ??= 0;
             model.Quantity += addedQuantity;
             dbContext.Models.Update(model);
 
-            // Ensure model has a storage record
             Storage storage;
             if (model.Storage != null)
             {
@@ -97,11 +127,9 @@ namespace Application.Services
             }
             else
             {
-                // Try to find storage for this product
                 storage = await dbContext.Storages
                     .FirstOrDefaultAsync(s => s.Product_Name == model.Name);
 
-                // If not found, create one
                 if (storage == null)
                 {
                     storage = new Storage
@@ -111,19 +139,33 @@ namespace Application.Services
                         Number_Of_Products = 0
                     };
                     dbContext.Storages.Add(storage);
-                    await dbContext.SaveChangesAsync(); // To get the ID
+                    await dbContext.SaveChangesAsync();
                 }
 
                 model.StorageID = storage.ID;
                 dbContext.Models.Update(model);
             }
 
-            // ✅ Update the storage count properly
             storage.Number_Of_Products += addedQuantity;
             dbContext.Storages.Update(storage);
 
             await dbContext.SaveChangesAsync();
+            ModelsChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        public async Task UpdateNotesAsync(int modelId, string notes)
+        {
+            var dbContext = (ClothesSystemDbContext)_modelRepository.GetDbContext();
+            var model = await dbContext.Models.FirstOrDefaultAsync(m => m.ID == modelId);
+
+            if (model == null)
+                throw new Exception("Model not found.");
+
+            model.Notes = notes;
+            dbContext.Models.Update(model);
+            await dbContext.SaveChangesAsync();
+
+            ModelsChanged?.Invoke(this, EventArgs.Empty);
         }
     }
-
 }

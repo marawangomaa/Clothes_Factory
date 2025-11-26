@@ -11,8 +11,8 @@ namespace Domain.Entities
         public int ID { get; set; }
         public string Number { get; set; }
         public string Model { get; set; }
+        public int ModelMetrag { get; set; } // ✅ Add this property
         public DateTime Date { get; set; }
-
     }
 
 }

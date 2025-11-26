@@ -31,6 +31,30 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <!-- Elegant Text Effect Style -->
+        <Style x:Key="ElegantTextStyle" TargetType="TextBlock">
+            <Setter Property="Foreground">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#FFFFFF" Offset="0.0"/>
+                        <GradientStop Color="#E6F0FA" Offset="0.5"/>
+                        <GradientStop Color="#B8D4F0" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#1E3C72" 
+                                    Direction="315" 
+                                    ShadowDepth="3" 
+                                    BlurRadius="8" 
+                                    Opacity="0.8"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Page.Resources>
 
     <!-- Page Background with gradient and shapes -->
@@ -51,14 +75,67 @@
             <Ellipse Width="100" Height="100" Fill="#33FFFFFF" Canvas.Left="200" Canvas.Top="100"/>
             <Ellipse Width="200" Height="200" Fill="#22FFFFFF" Canvas.Left="100" Canvas.Top="300"/>
             <Ellipse Width="120" Height="120" Fill="#33FFFFFF" Canvas.Left="250" Canvas.Top="400"/>
+
+            <!-- Additional decorative elements for luxury feel -->
+            <Path Data="M50,200 C100,150 150,250 200,200" Stroke="#44FFFFFF" StrokeThickness="2" Canvas.Left="300" Canvas.Top="50"/>
+            <Path Data="M400,100 C450,50 500,150 550,100" Stroke="#44FFFFFF" StrokeThickness="2" Canvas.Left="100" Canvas.Top="200"/>
         </Canvas>
 
         <!-- Main Layout -->
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="300">
-            <TextBlock Text="Eleganz"
-                       Foreground="White" FontSize="32" FontWeight="Bold"
-                       Margin="0,0,0,30"
-                       HorizontalAlignment="Center"/>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="320">
+
+            <!-- Enhanced Elegant Logo Container -->
+            <Border Background="Transparent" 
+                    Margin="0,0,0,30" 
+                    Padding="20,15"
+                    CornerRadius="15"
+                    BorderBrush="#88FFFFFF"
+                    BorderThickness="1">
+
+                <StackPanel>
+                    <!-- Main Logo Text with sophisticated styling -->
+                    <TextBlock Text="Eleganz" 
+                               FontSize="42" 
+                               Style="{StaticResource ElegantTextStyle}"
+                               HorizontalAlignment="Center"
+                               FontFamily="Segoe UI Light"
+                               Margin="0,0,0,5">
+                        <TextBlock.Effect>
+                            <DropShadowEffect Color="#1E3C72" 
+                                            Direction="315" 
+                                            ShadowDepth="4" 
+                                            BlurRadius="12" 
+                                            Opacity="0.6"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
+
+                    <!-- Subtitle -->
+                    <TextBlock Text="Fashion System" 
+                               Foreground="#CCE8FF" 
+                               FontSize="16" 
+                               FontStyle="Italic"
+                               HorizontalAlignment="Center"
+                               FontFamily="Segoe UI"
+                               Margin="0,5,0,0">
+                        <TextBlock.Effect>
+                            <DropShadowEffect Color="#1E3C72" 
+                                            Direction="315" 
+                                            ShadowDepth="2" 
+                                            BlurRadius="4" 
+                                            Opacity="0.5"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
+
+                    <!-- Decorative line -->
+                    <Rectangle Height="2" 
+                               Margin="40,10,40,5" 
+                               Fill="#88FFFFFF"
+                               RadiusX="1" 
+                               RadiusY="1"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Menu Buttons -->
             <Button Content="العملاء" Click="Clients_Click" Style="{StaticResource BlueButtonStyle}"/>
             <Button Content="المواد" Click="Materials_Click" Style="{StaticResource BlueButtonStyle}"/>
             <Button Content="العمال" Click="Workers_Click" Style="{StaticResource BlueButtonStyle}"/>
@@ -66,7 +143,17 @@
             <Button Content="المقص" Click="Scissors_Click" Style="{StaticResource BlueButtonStyle}"/>
             <Button Content="المخزن" Click="Storage_Click" Style="{StaticResource BlueButtonStyle}"/>
             <Button Content="البنك" Click="Bank_Click" Style="{StaticResource BlueButtonStyle}"/>
+            <!-- Add this button to your menu stack panel -->
+            <Button Content="💾 إنشاء نسخة احتياطية" Click="Backup_Click" Style="{StaticResource BlueButtonStyle}"/>
+            <Button Content="تحديث معلومات البنك" Click="BAnkUpdate_Click" Style="{StaticResource BlueButtonStyle}"/>    
+            
+            <!-- Optional: Version info -->
+            <TextBlock Text="v1.0" 
+                       Foreground="#88FFFFFF" 
+                       FontSize="12" 
+                       HorizontalAlignment="Center" 
+                       Margin="0,20,0,0"
+                       FontStyle="Italic"/>
         </StackPanel>
     </Grid>
-
 </Page>

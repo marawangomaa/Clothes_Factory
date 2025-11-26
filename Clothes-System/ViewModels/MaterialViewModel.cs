@@ -3,20 +3,36 @@ using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Clothes_System.Helpers;
 
 namespace Clothes_System.ViewModels
 {
-    public class MaterialViewModel
+    public class MaterialViewModel : INotifyPropertyChanged
     {
         private readonly MaterialService _materialService;
 
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
         public ObservableCollection<Material> Materials { get; set; } = new();
-        public Material NewMaterial { get; set; } = new Material();
+
+        private Material _newMaterial = new Material();
+        public Material NewMaterial
+        {
+            get => _newMaterial;
+            set
+            {
+                _newMaterial = value;
+                OnPropertyChanged(nameof(NewMaterial));
+            }
+        }
 
         public ICommand LoadMaterialsCommand { get; }
         public ICommand AddMaterialCommand { get; }
@@ -47,11 +63,12 @@ namespace Clothes_System.ViewModels
                 {
                     await _materialService.AddMaterialAsync(NewMaterial);
                     await LoadMaterials();
-                    NewMaterial = new Material(); // Reset for next entry
+
+                    // Reset input fields (this clears the TextBoxes)
+                    NewMaterial = new Material();
                 }
                 catch (Exception ex)
                 {
-                    // Show error message (optional: use MessageBox or pass to UI)
                     System.Windows.MessageBox.Show(ex.Message);
                 }
             }

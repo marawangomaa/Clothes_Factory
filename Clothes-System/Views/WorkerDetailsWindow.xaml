@@ -1,90 +1,173 @@
 ﻿<Window x:Class="Clothes_System.Views.WorkerDetailsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:helpers="clr-namespace:Clothes_System.Helpers"
-        Title="تفاصيل العامل" Height="500" Width="520"
+        Title="تفاصيل العامل" Height="600" Width="700"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         FlowDirection="RightToLeft"
-        Background="#F0F4F8">
-
-    <Window.Resources>
-        <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
-    </Window.Resources>
+        Background="#F0F4F8"
+        FontSize="20">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="15" Orientation="Vertical" >
 
             <!-- Header -->
-            <TextBlock Text="{Binding Worker.Name}" FontWeight="Bold" FontSize="18" Margin="0,0,0,5"/>
-            <TextBlock Text="{Binding Worker.Ph_Number}" FontStyle="Italic" Foreground="Gray" Margin="0,0,0,15"/>
+            <TextBlock Text="{Binding Worker.Name}" FontWeight="Bold" FontSize="26" Margin="0,0,0,5"/>
+            <TextBlock Text="{Binding Worker.Ph_Number}" FontStyle="Italic" Foreground="Gray" FontSize="22" Margin="0,0,0,10"/>
+            <TextBlock Text="{Binding Worker.Is_Weekly, StringFormat='نوع العامل: {0}'}" FontStyle="Italic" Foreground="Blue" FontSize="22" Margin="0,0,0,10">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Text" Value="نوع العامل: أسبوعي"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Worker.Is_Weekly}" Value="False">
+                                <Setter Property="Text" Value="نوع العامل: بالقطعة"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+
+            <!-- Summary -->
+            <Border Background="#E8F5E8" CornerRadius="8" Padding="10" Margin="0,0,0,15">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <StackPanel Margin="0,0,20,0">
+                        <TextBlock Text="إجمالي المبلغ المستحق:" FontWeight="Bold" FontSize="20"/>
+                        <TextBlock Text="{Binding TotalOwedAmount, StringFormat='{}{0:C}'}" FontSize="22" FontWeight="Bold" Foreground="Green"/>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,20,0">
+                        <TextBlock Text="إجمالي المدفوعات:" FontWeight="Bold" FontSize="20"/>
+                        <TextBlock Text="{Binding TotalPaymentsReceived, StringFormat='{}{0:C}'}" FontSize="22" FontWeight="Bold" Foreground="Blue"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="المبلغ المتبقي:" FontWeight="Bold" FontSize="20"/>
+                        <TextBlock Text="{Binding RemainingAmount, StringFormat='{}{0:C}'}" FontSize="22" FontWeight="Bold" 
+                                   Name="RemainingAmountText">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="Green"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding RemainingAmount}" Value="0">
+                                            <Setter Property="Foreground" Value="Green"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding RemainingAmount}">
+                                            <Setter Property="Foreground" Value="Red"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
 
             <!-- Add Pieces (only for non-weekly workers) -->
-            <StackPanel Orientation="Horizontal"
-                        Visibility="{Binding Worker.Is_Weekly, Converter={StaticResource InverseBoolToVisibilityConverter}}"
-                        Margin="0,0,0,15">
-                <TextBox Width="100"
-                         Margin="0,0,5,0"
-                         Text="{Binding NewWorkerPieces, UpdateSourceTrigger=PropertyChanged}"
-                         ToolTip="عدد القطع الجديدة"/>
-                <Button Content="إضافة قطع"
-                        Width="100"
-                        Background="#007ACC"
-                        Foreground="White"
-                        FontWeight="Bold"
-                        Command="{Binding AddWorkerPieceCommand}" />
-            </StackPanel>
+            <GroupBox Header="إضافة قطع عمل" FontSize="22" Margin="0,0,0,15">
+                <GroupBox.Style>
+                    <Style TargetType="GroupBox">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Worker.Is_Weekly}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </GroupBox.Style>
+                <StackPanel Orientation="Horizontal" Margin="5">
+                    <ComboBox Width="150" Margin="0,0,5,0" FontSize="20"
+                              ItemsSource="{Binding Models}"
+                              DisplayMemberPath="Name"
+                              SelectedItem="{Binding SelectedModel}"
+                              ToolTip="اختر النموذج"/>
+                    <TextBox Width="80" Margin="0,0,5,0" FontSize="20"
+                             Text="{Binding NewWorkerPieces, UpdateSourceTrigger=PropertyChanged}"
+                             ToolTip="عدد القطع"/>
+                    <Button Content="إضافة قطع"
+                            Width="120"
+                            Background="#007ACC"
+                            Foreground="White"
+                            FontWeight="Bold"
+                            FontSize="20"
+                            Command="{Binding AddWorkerPieceCommand}" />
+                </StackPanel>
+            </GroupBox>
 
             <!-- Payment Section -->
-            <GroupBox Header="إضافة دفعة" Margin="0,0,0,15">
+            <GroupBox Header="إضافة دفعة" FontSize="22" Margin="0,0,0,15">
                 <StackPanel Orientation="Horizontal" Margin="5">
-                    <TextBox Width="100"
+                    <TextBox Width="100" FontSize="20"
                              Margin="0,0,5,0"
                              Text="{Binding PaymentAmount, UpdateSourceTrigger=PropertyChanged}"
                              ToolTip="المبلغ"/>
-                    <ComboBox Width="120"
+                    <ComboBox Width="120" FontSize="20"
                               SelectedItem="{Binding SelectedPaymentType, UpdateSourceTrigger=PropertyChanged}"
                               ItemsSource="{Binding PaymentTypes}"/>
                     <Button Content="إضافة دفعة"
-                            Width="120"
+                            Width="140"
                             Margin="5,0,0,0"
                             Background="#28A745"
                             Foreground="White"
                             FontWeight="Bold"
+                            FontSize="20"
                             Command="{Binding AddWorkerPaymentCommand}" />
                 </StackPanel>
             </GroupBox>
 
-            <!-- Daily Pieces -->
-            <GroupBox Header="قطع يومية" Margin="0,0,0,15">
+            <!-- Reset Button -->
+            <Button Content="🔄 إعادة تعيين السجلات (نهاية الأسبوع)"
+                    FontSize="22"
+                    Command="{Binding ResetWorkerCommand}"
+                    Background="#FF6B35"
+                    Foreground="White"
+                    FontWeight="Bold"
+                    Margin="0,0,0,15"
+                    Padding="10,5"/>
+
+            <!-- Daily Pieces with Model Details (only for non-weekly workers) -->
+            <GroupBox Header="تفاصيل القطع" FontSize="22" Margin="0,0,0,15">
+                <GroupBox.Style>
+                    <Style TargetType="GroupBox">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Worker.Is_Weekly}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </GroupBox.Style>
                 <DataGrid ItemsSource="{Binding Worker.DailyPieces}"
                           AutoGenerateColumns="False"
                           CanUserAddRows="False"
                           Margin="5"
                           IsReadOnly="True"
+                          FontSize="18"
                           AlternatingRowBackground="#E6F0FA"
                           RowBackground="White"
                           HeadersVisibility="Column">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="التاريخ" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}}" Width="*" />
+                        <DataGridTextColumn Header="النموذج" Binding="{Binding Model.Name}" Width="*" />
                         <DataGridTextColumn Header="عدد القطع" Binding="{Binding Pieces}" Width="*" />
+                        <DataGridTextColumn Header="سعر القطعة" Binding="{Binding Model.MakingPrice, StringFormat='{}{0:C}'}" Width="*" />
+                        <DataGridTextColumn Header="الإجمالي" Binding="{Binding TotalAmount, StringFormat='{}{0:C}'}" Width="*" />
                     </DataGrid.Columns>
                 </DataGrid>
             </GroupBox>
 
             <!-- Payment History -->
-            <GroupBox Header="سجل الدفعات" Margin="0,0,0,15">
+            <GroupBox Header="سجل الدفعات" FontSize="22" Margin="0,0,0,15">
                 <DataGrid ItemsSource="{Binding Worker.BankTransactions}"
                           AutoGenerateColumns="False"
                           CanUserAddRows="False"
                           Margin="5"
                           IsReadOnly="True"
+                          FontSize="18"
                           AlternatingRowBackground="#E6F0FA"
                           RowBackground="White"
                           HeadersVisibility="Column">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="التاريخ" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}}" Width="*" />
-                        <DataGridTextColumn Header="المبلغ" Binding="{Binding Amount}" Width="*" />
+                        <DataGridTextColumn Header="المبلغ" Binding="{Binding Amount, StringFormat='{}{0:C}'}" Width="*" />
+                        <DataGridTextColumn Header="النوع" Binding="{Binding Type}" Width="*" />
                     </DataGrid.Columns>
                 </DataGrid>
             </GroupBox>

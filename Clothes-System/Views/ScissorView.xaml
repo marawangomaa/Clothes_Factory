@@ -68,12 +68,20 @@
                               Margin="0,0,0,10"
                               Padding="5"/>
 
+                    <!-- ✅ Show selected model's metrag -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBlock Text="متراج النموذج:" FontWeight="SemiBold" Margin="0,0,5,0"/>
+                        <TextBlock Text="{Binding SelectedModelMetragDisplay}" 
+                                   Foreground="#007ACC" 
+                                   FontWeight="Bold"/>
+                    </StackPanel>
+
                     <!-- المتراج -->
                     <TextBlock Text="عدد القطع:" Margin="0,5,0,2"/>
                     <TextBox Text="{Binding Meters, UpdateSourceTrigger=PropertyChanged}" 
                              Margin="0,0,0,10" 
                              Padding="5"/>
-                    <!-- Notes  -->
+
                     <Button Content="إضافة القصّة" 
                             Command="{Binding AddCutCommand}" 
                             Background="#27AE60"
@@ -99,10 +107,14 @@
                               RowHeight="32">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="الموديل" Binding="{Binding Model}" Width="*"/>
+                            <DataGridTextColumn Header="متراج النموذج" Binding="{Binding ModelMetrag}" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="{Binding ModelMetrag, StringFormat='{}{0} متر'}"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
                             <DataGridTextColumn Header="عدد القطع" Binding="{Binding Number}" Width="*"/>
-                            <DataGridTextColumn Header="المتراج" Binding="{Binding Number}" Width="*"/>
-                            <!-- Not Done -->
-
                             <DataGridTextColumn Header="التاريخ" Binding="{Binding Date, StringFormat={}{0:dd/MM/yyyy}}" Width="*"/>
                         </DataGrid.Columns>
                     </DataGrid>

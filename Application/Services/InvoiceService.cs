@@ -225,8 +225,7 @@ namespace Application.Services
             decimal paymentAmount = 0)
         {
             var client = await _clientRepo.GetByIdAsync(clientId) ?? throw new Exception("العميل غير موجود");
-            var bank = await _bankService.GetOrCreateBankAsync();
-
+            
             // ----------- CHECK STOCK FIRST -------------
             foreach (var item in items)
             {
@@ -252,7 +251,7 @@ namespace Application.Services
                 InvoiceType = "فاتورة جديدة",
                 TotalAmount = totalAmount,
                 ClinteID = clientId,
-                BankID = bank.ID,
+                BankID = (await _bankService.GetOrCreateBankAsync()).ID, // Get bank ID properly
                 PaymentMethod = paymentType,
                 Type = "فاتورة جديدة"
             };
@@ -290,20 +289,13 @@ namespace Application.Services
             {
                 decimal pay = Math.Min(paymentAmount, totalAmount);
 
-                bank.TotalAmount += pay;
-
-                await _transactionRepo.AddAsync(new BankTransaction
-                {
-                    Date = DateTime.Now,
-                    Type = "دخل",
-                    Amount = pay,
-                    TotalAfterTransaction = bank.TotalAmount,
-                    InvoiceID = invoice.ID,
-                    BankID = bank.ID
-                });
-
-                _bankRepo.Update(bank);
-                await _transactionRepo.SaveChangesAsync();
+                // ✅ USE BANK SERVICE INSTEAD OF MANUAL TRANSACTION CREATION
+                await _bankService.AddTransactionAsync(
+                    description: $"دفعة فاتورة بيع - {client.Name}",
+                    amount: pay,
+                    isIncome: true,
+                    invoiceId: invoice.ID  // This will automatically set RelatedTo to client name
+                );
 
                 client.Debt -= pay;
                 if (client.Debt < 0) client.Debt = 0;
@@ -325,8 +317,6 @@ namespace Application.Services
             var client = await _clientRepo.GetByIdAsync(clientId)
                          ?? throw new Exception("العميل غير موجود");
 
-            var bank = await _bankService.GetOrCreateBankAsync();
-
             var invoice = new Invoice
             {
                 Date = DateTime.Now,
@@ -334,7 +324,7 @@ namespace Application.Services
                 InvoiceType = "مرتجع",
                 TotalAmount = totalRefund,
                 ClinteID = clientId,
-                BankID = bank.ID,
+                BankID = (await _bankService.GetOrCreateBankAsync()).ID,
                 PaymentMethod = "مرتجع",
                 Type = "مرتجع"
             };
@@ -369,27 +359,20 @@ namespace Application.Services
             await _storageRepo.SaveChangesAsync();
             await _invoiceModelRepo.SaveChangesAsync();
 
-            // ====== BANK OUTCOME ======
-            bank.TotalAmount -= totalRefund;
-            _bankRepo.Update(bank);
-
-            await _transactionRepo.AddAsync(new BankTransaction
-            {
-                Date = DateTime.Now,
-                Type = "خارج",                 // <--- mark as Outcome
-                Amount = totalRefund,
-                TotalAfterTransaction = bank.TotalAmount,
-                InvoiceID = invoice.ID,
-                BankID = bank.ID
-            });
+            // ====== BANK OUTCOME USING BANK SERVICE ======
+            // ✅ USE BANK SERVICE INSTEAD OF MANUAL TRANSACTION CREATION
+            await _bankService.AddTransactionAsync(
+                description: $"مرتجع فاتورة - {client.Name}",
+                amount: totalRefund,
+                isIncome: false,  // This is an outcome (refund)
+                invoiceId: invoice.ID  // This will automatically set RelatedTo to client name
+            );
 
             // ====== CLIENT DEBT ======
             client.Debt -= totalRefund;
             if (client.Debt < 0) client.Debt = 0;
             _clientRepo.Update(client);
 
-            await _transactionRepo.SaveChangesAsync();
-            await _bankRepo.SaveChangesAsync();
             await _clientRepo.SaveChangesAsync();
         }
 
@@ -405,40 +388,30 @@ namespace Application.Services
 
             // load client and bank
             var client = await _clientRepo.GetByIdAsync(clientId) ?? throw new Exception("العميل غير موجود");
-            var bank = await _bankService.GetOrCreateBankAsync();
 
             // 1) create payment invoice so we have an Invoice.ID to link to the transaction
             var invoice = new Invoice
             {
                 Date = DateTime.Now,
                 Number = Guid.NewGuid().ToString("N")[..8].ToUpper(),
-                PaymentMethod = paymentMethod ?? "دفعة",   // store the chosen method
+                PaymentMethod = paymentMethod ?? "دفعة",
                 InvoiceType = "دفعة",
-                Type = "دفعة",                              // if you use Type string for something else adjust accordingly
+                Type = "دفعة",
                 TotalAmount = amount,
                 ClinteID = clientId,
-                BankID = bank.ID
+                BankID = (await _bankService.GetOrCreateBankAsync()).ID
             };
 
             await _invoiceRepo.AddAsync(invoice);
-            await _invoiceRepo.SaveChangesAsync(); // now invoice.ID is available
+            await _invoiceRepo.SaveChangesAsync();
 
-            // 2) update bank total and create bank transaction linked to invoice
-            bank.TotalAmount += amount;
-            _bankRepo.Update(bank);
-
-            var tx = new BankTransaction
-            {
-                Date = DateTime.Now,
-                Type = "دخل",
-                Amount = amount,
-                TotalAfterTransaction = bank.TotalAmount,
-                InvoiceID = invoice.ID,
-                BankID = bank.ID
-            };
-
-            await _transactionRepo.AddAsync(tx);
-            await _transactionRepo.SaveChangesAsync();
+            // 2) ✅ USE BANK SERVICE INSTEAD OF MANUAL TRANSACTION CREATION
+            await _bankService.AddTransactionAsync(
+                description: $"دفعة من العميل - {client.Name}",
+                amount: amount,
+                isIncome: true,
+                invoiceId: invoice.ID  // This will automatically set RelatedTo to client name
+            );
 
             // 3) decrease client debt
             client.Debt -= amount;

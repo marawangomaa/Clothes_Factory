@@ -46,5 +46,24 @@ namespace Clothes_System.Views
             var main = (MainWindow)System.Windows.Application.Current.MainWindow;
             main.Navigate(new MenuPage());
         }
+
+        private void Decimal_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            // Only allow digits and one dot
+            e.Handled = !IsTextAllowed((sender as TextBox).Text, e.Text);
+        }
+
+        private bool IsTextAllowed(string currentText, string newText)
+        {
+            // Combine current text and new input
+            string fullText = currentText + newText;
+
+            // Only allow numbers and one decimal point
+            if (decimal.TryParse(fullText, out _))
+                return true;
+
+            return false;
+        }
+
     }
 }

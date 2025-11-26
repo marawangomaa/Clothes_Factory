@@ -21,14 +21,15 @@ namespace Application.Services
             return new ObservableCollection<Scissor>(list);
         }
 
-        public async Task AddCutAsync(string modelName, decimal meters)
+        public async Task AddCutAsync(string modelName, int modelMetrag, decimal meters)
         {
             if (string.IsNullOrWhiteSpace(modelName))
                 throw new Exception("Model name is required.");
 
             var cut = new Scissor
             {
-                Model = modelName, // ✅ Save model name as text
+                Model = modelName,
+                ModelMetrag = modelMetrag, // ✅ Store the model's metrag
                 Number = meters.ToString(),
                 Date = DateTime.Now
             };

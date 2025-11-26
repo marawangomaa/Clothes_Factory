@@ -9,9 +9,16 @@ namespace Clothes_System.Views
 {
     public partial class ClientDetailsView : Page
     {
+
+        private readonly ClinteService _clinteService;
+        private readonly InvoiceService _invoiceService;
+
         public ClientDetailsView(Clinte client)
         {
             InitializeComponent();
+
+            _clinteService = App.ServiceProvider.GetRequiredService<ClinteService>();
+            _invoiceService = App.ServiceProvider.GetRequiredService<InvoiceService>();
 
             var invoiceService = App.ServiceProvider.GetRequiredService<InvoiceService>();
 
@@ -19,9 +26,9 @@ namespace Clothes_System.Views
         }
         private void Back_Click(object sender, RoutedEventArgs e)
         {
-            // Navigate back to the MenuPage
+            // Navigate back to the ClientView page
             var main = (MainWindow)System.Windows.Application.Current.MainWindow;
-            main.Navigate(new MenuPage());
+            main.Navigate(new ClinteView(_clinteService, _invoiceService));
         }
         private void InvoicesDataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {

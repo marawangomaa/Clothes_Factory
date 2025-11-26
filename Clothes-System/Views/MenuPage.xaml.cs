@@ -57,6 +57,10 @@ namespace Clothes_System.Views
         {
             Main.Navigate(new BankView(_bankViewModel));
         }
+        private void BAnkUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            Main.Navigate(new BankUpdateView(_bankViewModel));
+        }
 
         // Add missing button handlers
         private void Invoices_Click(object sender, RoutedEventArgs e)
@@ -72,6 +76,28 @@ namespace Clothes_System.Views
         private void Scissors_Click(object sender, RoutedEventArgs e)
         {
             Main.Navigate(new ScissorView());
+        }
+
+        private async void Backup_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var backupService = App.GetService<BackupService>();
+                var result = await backupService.CreateBackupAsync();
+
+                if (result.Success)
+                {
+                    MessageBox.Show(result.Message, "نجاح", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show(result.Message, "تحذير", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"خطأ في النسخ الاحتياطي: {ex.Message}", "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }
